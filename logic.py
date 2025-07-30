@@ -1,10 +1,10 @@
-# logic.py (Versão de Produção v2.4 - Com Otimizador Hierárquico)
+# logic.py (Versão de Produção v2.5 - Polimento Final)
 
 from database import get_food_data, get_meal_components
 from datetime import datetime
 import random
 
-# (As funções auxiliares `calculate_macros_from_list` e `build_meal_from_template` podem permanecer as mesmas da v2.3)
+# (As funções auxiliares podem permanecer as mesmas da v2.3/v2.4)
 def calculate_macros_from_list(items_list, db_foods):
     total_macros = {"kcal": 0, "p": 0, "c": 0, "g": 0}
     for item in items_list:
@@ -78,35 +78,38 @@ def generate_plan_logic(request_data):
         meal["nome_refeicao_id"] = meal_name
         draft_plan.append(meal)
 
-    # 3. OTIMIZADOR HIERÁRQUICO
-    for _ in range(20): # Mais iterações para convergência
+    # 3. OTIMIZADOR HIERÁRQUICO v2.5
+    for _ in range(25): # Mais iterações para ajuste fino
         summary = calculate_macros_from_list([item for meal in draft_plan for item in meal["internal_items"]], db_foods)
         
         # PRIORIDADE 1: ATINGIR O PISO DE PROTEÍNA
         if summary["p"] < meta_proteina_min:
-            # Encontra a refeição com mais proteína e a aumenta
             meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["p"])
             for item in meal_to_adjust["internal_items"]:
-                if "frango" in item["id"] or "tilapia" in item["id"] or "whey" in item["id"] or "patinho" in item["id"]:
-                    item["gramas"] *= 1.1 # Aumenta em 10%
+                # Lógica de substituição inteligente: prioriza fontes de proteína magra
+                if "whey" in item["id"] or "frango" in item["id"] or "tilapia" in item["id"] or "clara" in item["id"]:
+                    item["gramas"] *= 1.15 # Aumenta mais agressivamente
+                    break
+            else: # Se não encontrou proteína magra, aumenta a primeira que achar
+                meal_to_adjust["internal_items"][0]["gramas"] *= 1.05
+        
+        # PRIORIDADE 2: RESPEITAR O TETO DE GORDURAS
+        if summary["g"] > meta_gordura_max_g:
+            meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["g"])
+            for item in meal_to_adjust["internal_items"]:
+                if "mussarela" in item["id"] or "requeijao" in item["id"] or "gema" in item["id"] or "pao_hamburguer" in item["id"]:
+                    item["gramas"] *= 0.85 # Reduz mais agressivamente
                     break
         
-        # PRIORIDADE 2: RESPEITAR O TETO DE CARBOIDRATOS E GORDURAS
+        # PRIORIDADE 3: RESPEITAR O TETO DE CARBOIDRATOS
         if summary["c"] > meta_carb_max_g:
             meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["c"])
             for item in meal_to_adjust["internal_items"]:
                 if "arroz" in item["id"] or "batata" in item["id"] or "pao" in item["id"] or "aveia" in item["id"] or "tapioca" in item["id"]:
-                    item["gramas"] *= 0.9 # Reduz em 10%
-                    break
-        
-        if summary["g"] > meta_gordura_max_g:
-            meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["g"])
-            for item in meal_to_adjust["internal_items"]:
-                if "mussarela" in item["id"] or "requeijao" in item["id"] or "gema" in item["id"]:
                     item["gramas"] *= 0.9
                     break
 
-        # Recalcula o rascunho após cada ajuste
+        # Recalcula o rascunho
         for meal in draft_plan:
             new_macros = calculate_macros_from_list(meal["internal_items"], db_foods)
             meal["macros"] = new_macros
@@ -114,8 +117,7 @@ def generate_plan_logic(request_data):
 
     # 4. AJUSTE FINAL DE CALORIAS
     final_summary = calculate_macros_from_list([item for meal in draft_plan for item in meal["internal_items"]], db_foods)
-    kcal_diff = final_summary["kcal"] - meta_kcal
-    if abs(kcal_diff) > 50: # Se ainda estiver longe, faz um ajuste geral
+    if final_summary["kcal"] > 0:
         scaling_factor = meta_kcal / final_summary["kcal"]
         for meal in draft_plan:
             for item in meal["internal_items"]:
@@ -137,7 +139,7 @@ def generate_plan_logic(request_data):
             "itens": formatted_items,
             "nome_refeicao": meal_draft["nome_refeicao_id"].replace("_", " ").title(),
             "horario": horarios.get(meal_draft["nome_refeicao_id"], "N/A"),
-            "substituicoes": [] # Lógica de substituições ainda a ser implementada com precisão
+            "substituicoes": []
         }
         final_refeicoes.append(meal_final)
         for key in final_summary_after_scaling:
