@@ -1,4 +1,39 @@
-Flask
-gunicorn
-pulp
-pydantic
+# requirements.txt (Versão 4.0 - Dependências completas com versões fixas)
+
+# Framework Web
+Flask==2.2.3
+gunicorn==20.1.0
+Werkzeug==2.2.3
+flask-cors==3.0.10
+flask-limiter==2.8.1
+
+# Servidor e Middleware
+waitress==2.1.2
+gevent==22.10.2
+
+# Otimização e Cálculos
+pulp==2.7.0
+numpy==1.24.2
+pandas==1.5.3
+scipy==1.10.1
+
+# Validação de Dados
+pydantic==1.10.7
+jsonschema==4.17.3
+marshmallow==3.19.0
+
+# Utilitários
+python-dotenv==1.0.0
+pytz==2023.3
+requests==2.28.2
+tenacity==8.2.2
+structlog==23.1.0
+
+# Monitoramento/Debugging
+prometheus-flask-exporter==0.22.4
+sentry-sdk[flask]==1.17.0
+pylint==2.17.0
+
+# Segurança
+pyjwt==2.6.0
+cryptography==39.0.2
