@@ -1,470 +1,290 @@
 def get_food_data():
-    """Base de dados nutricional completa - Método Pedro Barros"""
+    # Esta é uma versão expandida, mas você precisará adicionar TODOS os alimentos
+    # de 'equivalencias_nutricionais_corretas_v14.txt' com seus macros.
     return {
-        # PROTEÍNAS - Base: Frango 100g = 184 kcal
-        "file_de_frango_grelhado": {
-            "kcal_por_g": 1.84,
-            "proteina_por_g": 0.31,
-            "gordura_por_g": 0.04,
-            "carb_por_g": 0.0
-        },
-        "patinho_magro": {
-            "kcal_por_g": 2.04,
-            "proteina_por_g": 0.29,
-            "gordura_por_g": 0.09,
-            "carb_por_g": 0.0
-        },
-        "alcatra": {
-            "kcal_por_g": 1.98,
-            "proteina_por_g": 0.28,
-            "gordura_por_g": 0.09,
-            "carb_por_g": 0.0
-        },
-        "file_mignon": {
-            "kcal_por_g": 2.04,
-            "proteina_por_g": 0.29,
-            "gordura_por_g": 0.09,
-            "carb_por_g": 0.0
-        },
-        "file_suino": {
-            "kcal_por_g": 2.12,
-            "proteina_por_g": 0.27,
-            "gordura_por_g": 0.11,
-            "carb_por_g": 0.0
-        },
-        "salmao_fresco": {
-            "kcal_por_g": 2.06,
-            "proteina_por_g": 0.22,
-            "gordura_por_g": 0.13,
-            "carb_por_g": 0.0
-        },
-        "atum_fresco": {
-            "kcal_por_g": 1.67,
-            "proteina_por_g": 0.29,
-            "gordura_por_g": 0.05,
-            "carb_por_g": 0.0
-        },
-        "peixe_branco": {
-            "kcal_por_g": 1.50,
-            "proteina_por_g": 0.28,
-            "gordura_por_g": 0.04,
-            "carb_por_g": 0.0
-        },
-        "camarao": {
-            "kcal_por_g": 1.40,
-            "proteina_por_g": 0.27,
-            "gordura_por_g": 0.03,
-            "carb_por_g": 0.0
-        },
-        "ovo_inteiro": {
-            "kcal_por_g": 1.40,
-            "proteina_por_g": 0.12,
-            "gordura_por_g": 0.10,
-            "carb_por_g": 0.01
-        },
-        "clara_de_ovo": {
-            "kcal_por_g": 0.52,
-            "proteina_por_g": 0.11,
-            "gordura_por_g": 0.0,
-            "carb_por_g": 0.01
-        },
-        
-        # CARBOIDRATOS - Base: Arroz 50g = 62 kcal
-        "arroz_branco_cozido": {
-            "kcal_por_g": 1.24,
-            "proteina_por_g": 0.025,
-            "gordura_por_g": 0.003,
-            "carb_por_g": 0.28
-        },
-        "batata_inglesa": {
-            "kcal_por_g": 0.87,
-            "proteina_por_g": 0.02,
-            "gordura_por_g": 0.001,
-            "carb_por_g": 0.20
-        },
-        "batata_doce": {
-            "kcal_por_g": 0.86,
-            "proteina_por_g": 0.016,
-            "gordura_por_g": 0.001,
-            "carb_por_g": 0.20
-        },
-        "macarrao_cozido": {
-            "kcal_por_g": 1.40,
-            "proteina_por_g": 0.05,
-            "gordura_por_g": 0.009,
-            "carb_por_g": 0.28
-        },
-        "aipim_mandioca": {
-            "kcal_por_g": 1.60,
-            "proteina_por_g": 0.014,
-            "gordura_por_g": 0.003,
-            "carb_por_g": 0.38
-        },
-        "inhame": {
-            "kcal_por_g": 1.17,
-            "proteina_por_g": 0.015,
-            "gordura_por_g": 0.002,
-            "carb_por_g": 0.28
-        },
-        "cuscuz": {
-            "kcal_por_g": 1.12,
-            "proteina_por_g": 0.037,
-            "gordura_por_g": 0.002,
-            "carb_por_g": 0.23
-        },
-        "tapioca_seca": {
-            "kcal_por_g": 3.40,
-            "proteina_por_g": 0.005,
-            "gordura_por_g": 0.002,
-            "carb_por_g": 0.85
-        },
-        "pao_frances": {
-            "kcal_por_g": 2.86,
-            "proteina_por_g": 0.10,
-            "gordura_por_g": 0.04,
-            "carb_por_g": 0.55
-        },
-        "pao_forma_integral": {
-            "kcal_por_g": 2.50,
-            "proteina_por_g": 0.09,
-            "gordura_por_g": 0.03,
-            "carb_por_g": 0.48
-        },
-        
-        # GORDURAS
-        "azeite_extra_virgem": {
-            "kcal_por_g": 8.8,
-            "proteina_por_g": 0.0,
-            "gordura_por_g": 1.0,
-            "carb_por_g": 0.0
-        },
-        "pasta_amendoim": {
-            "kcal_por_g": 5.88,
-            "proteina_por_g": 0.25,
-            "gordura_por_g": 0.50,
-            "carb_por_g": 0.20
-        },
-        
-        # LATICÍNIOS
-        "iogurte_natural_desnatado": {
-            "kcal_por_g": 0.55,
-            "proteina_por_g": 0.04,
-            "gordura_por_g": 0.001,
-            "carb_por_g": 0.08
-        },
-        "queijo_cottage": {
-            "kcal_por_g": 0.65,
-            "proteina_por_g": 0.11,
-            "gordura_por_g": 0.01,
-            "carb_por_g": 0.04
-        },
-        "queijo_minas_frescal": {
-            "kcal_por_g": 1.08,
-            "proteina_por_g": 0.14,
-            "gordura_por_g": 0.05,
-            "carb_por_g": 0.03
-        },
-        "requeijao_light": {
-            "kcal_por_g": 1.88,
-            "proteina_por_g": 0.10,
-            "gordura_por_g": 0.15,
-            "carb_por_g": 0.03
-        },
-        "queijo_mussarela": {
-            "kcal_por_g": 2.80,
-            "proteina_por_g": 0.22,
-            "gordura_por_g": 0.20,
-            "carb_por_g": 0.03
-        },
-        
-        # LEGUMINOSAS
-        "feijao_cozido": {
-            "kcal_por_g": 0.61,
-            "proteina_por_g": 0.04,
-            "gordura_por_g": 0.003,
-            "carb_por_g": 0.11
-        },
-        "lentilha_cozida": {
-            "kcal_por_g": 0.70,
-            "proteina_por_g": 0.09,
-            "gordura_por_g": 0.004,
-            "carb_por_g": 0.12
-        },
-        "grao_de_bico_cozido": {
-            "kcal_por_g": 0.72,
-            "proteina_por_g": 0.08,
-            "gordura_por_g": 0.03,
-            "carb_por_g": 0.12
-        },
-        
-        # SUPLEMENTOS
-        "whey_protein": {
-            "kcal_por_g": 4.06,
-            "proteina_por_g": 0.80,
-            "gordura_por_g": 0.05,
-            "carb_por_g": 0.10
-        },
-        
-        # FIBRAS E TEMPEROS
-        "chia": {
-            "kcal_por_g": 3.80,
-            "proteina_por_g": 0.17,
-            "gordura_por_g": 0.31,
-            "carb_por_g": 0.08
-        },
-        "psyllium": {
-            "kcal_por_g": 0.80,
-            "proteina_por_g": 0.01,
-            "gordura_por_g": 0.01,
-            "carb_por_g": 0.85
-        },
-        "cacau_po": {
-            "kcal_por_g": 2.80,
-            "proteina_por_g": 0.20,
-            "gordura_por_g": 0.14,
-            "carb_por_g": 0.35
-        },
-        "canela_po": {
-            "kcal_por_g": 2.61,
-            "proteina_por_g": 0.04,
-            "gordura_por_g": 0.01,
-            "carb_por_g": 0.54
-        },
-        
-        # VEGETAIS (média)
-        "legumes_variados": {
-            "kcal_por_g": 0.25,
-            "proteina_por_g": 0.02,
-            "gordura_por_g": 0.002,
-            "carb_por_g": 0.05
-        },
-        "salada_verde": {
-            "kcal_por_g": 0.18,
-            "proteina_por_g": 0.015,
-            "gordura_por_g": 0.002,
-            "carb_por_g": 0.03
-        },
-        
-        # FRUTAS
-        "banana": {
-            "kcal_por_g": 0.92,
-            "proteina_por_g": 0.01,
-            "gordura_por_g": 0.003,
-            "carb_por_g": 0.23
-        },
-        "mamao": {
-            "kcal_por_g": 0.39,
-            "proteina_por_g": 0.005,
-            "gordura_por_g": 0.001,
-            "carb_por_g": 0.10
-        },
-        "frutas_gerais": {
-            "kcal_por_g": 0.48,
-            "proteina_por_g": 0.008,
-            "gordura_por_g": 0.003,
-            "carb_por_g": 0.12
-        }
+        "file_de_frango_grelhado": {"kcal_por_g": 1.65, "proteina_por_g": 0.31, "gordura_por_g": 0.04, "carb_por_g": 0.0},
+        "arroz_branco_cozido": {"kcal_por_g": 1.3, "proteina_por_g": 0.025, "gordura_por_g": 0.002, "carb_por_g": 0.28},
+        "azeite_extra_virgem": {"kcal_por_g": 8.8, "proteina_por_g": 0.0, "gordura_por_g": 1.0, "carb_por_g": 0.0},
+        "ovo_de_galinha_inteiro": {"kcal_por_g": 1.55, "proteina_por_g": 0.13, "gordura_por_g": 0.11, "carb_por_g": 0.01},
+        "pao_de_forma_integral": {"kcal_por_g": 2.5, "proteina_por_g": 0.09, "gordura_por_g": 0.03, "carb_por_g": 0.45},
+        "requeijao_light": {"kcal_por_g": 1.88, "proteina_por_g": 0.08, "gordura_por_g": 0.15, "carb_por_g": 0.03},
+        "iogurte_natural_desnatado": {"kcal_por_g": 0.55, "proteina_por_g": 0.05, "gordura_por_g": 0.0, "carb_por_g": 0.07},
+        "mamao": {"kcal_por_g": 0.39, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.1},
+        "chia": {"kcal_por_g": 4.86, "proteina_por_g": 0.17, "gordura_por_g": 0.31, "carb_por_g": 0.42},
+        "whey_protein": {"kcal_por_g": 4.0, "proteina_por_g": 0.8, "gordura_por_g": 0.05, "carb_por_g": 0.1},
+        "batata_inglesa": {"kcal_por_g": 0.87, "proteina_por_g": 0.02, "gordura_por_g": 0.0, "carb_por_g": 0.2},
+        "batata_doce": {"kcal_por_g": 0.86, "proteina_por_g": 0.02, "gordura_por_g": 0.0, "carb_por_g": 0.2},
+        "macarrao_cozido": {"kcal_por_g": 1.4, "proteina_por_g": 0.05, "gordura_por_g": 0.01, "carb_por_g": 0.3},
+        "aipim_mandioca": {"kcal_por_g": 1.6, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.38},
+        "inhame": {"kcal_por_g": 1.17, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.27},
+        "cuscuz": {"kcal_por_g": 1.12, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.25},
+        "tapioca_seca": {"kcal_por_g": 3.4, "proteina_por_g": 0.0, "gordura_por_g": 0.0, "carb_por_g": 0.85},
+        "pao_frances": {"kcal_por_g": 2.86, "proteina_por_g": 0.08, "gordura_por_g": 0.01, "carb_por_g": 0.58},
+        "biscoitos_de_arroz": {"kcal_por_g": 4.0, "proteina_por_g": 0.07, "gordura_por_g": 0.04, "carb_por_g": 0.85},
+        "patinho_magro": {"kcal_por_g": 2.04, "proteina_por_g": 0.36, "gordura_por_g": 0.06, "carb_por_g": 0.0},
+        "alcatra": {"kcal_por_g": 1.98, "proteina_por_g": 0.34, "gordura_por_g": 0.06, "carb_por_g": 0.0},
+        "file_mignon": {"kcal_por_g": 2.04, "proteina_por_g": 0.36, "gordura_por_g": 0.06, "carb_por_g": 0.0},
+        "file_suino": {"kcal_por_g": 2.12, "proteina_por_g": 0.35, "gordura_por_g": 0.07, "carb_por_g": 0.0},
+        "salmao_fresco": {"kcal_por_g": 2.06, "proteina_por_g": 0.2, "gordura_por_g": 0.13, "carb_por_g": 0.0},
+        "atum_fresco": {"kcal_por_g": 1.67, "proteina_por_g": 0.23, "gordura_por_g": 0.08, "carb_por_g": 0.0},
+        "peixe_branco": {"kcal_por_g": 1.5, "proteina_por_g": 0.2, "gordura_por_g": 0.07, "carb_por_g": 0.0},
+        "camarao": {"kcal_por_g": 1.4, "proteina_por_g": 0.24, "gordura_por_g": 0.03, "carb_por_g": 0.0},
+        "queijo_cottage": {"kcal_por_g": 0.65, "proteina_por_g": 0.11, "gordura_por_g": 0.01, "carb_por_g": 0.03},
+        "queijo_minas_frescal": {"kcal_por_g": 1.08, "proteina_por_g": 0.17, "gordura_por_g": 0.04, "carb_por_g": 0.02},
+        "queijo_mussarela": {"kcal_por_g": 3.5, "proteina_por_g": 0.22, "gordura_por_g": 0.28, "carb_por_g": 0.01},
+        "feijao_cozido": {"kcal_por_g": 0.61, "proteina_por_g": 0.05, "gordura_por_g": 0.0, "carb_por_g": 0.11},
+        "lentilha_cozida": {"kcal_por_g": 0.7, "proteina_por_g": 0.09, "gordura_por_g": 0.0, "carb_por_g": 0.16},
+        "grao_de_bico_cozido": {"kcal_por_g": 0.72, "proteina_por_g": 0.09, "gordura_por_g": 0.01, "carb_por_g": 0.12},
+        "ervilha_cozida": {"kcal_por_g": 0.6, "proteina_por_g": 0.05, "gordura_por_g": 0.0, "carb_por_g": 0.11},
+        "milho_cozido": {"kcal_por_g": 0.9, "proteina_por_g": 0.03, "gordura_por_g": 0.01, "carb_por_g": 0.2},
+        "psyllium": {"kcal_por_g": 0.7, "proteina_por_g": 0.0, "gordura_por_g": 0.0, "carb_por_g": 0.0},
+        "cacau_em_po_100": {"kcal_por_g": 2.8, "proteina_por_g": 0.2, "gordura_por_g": 0.14, "carb_por_g": 0.1},
+        "canela_em_po": {"kcal_por_g": 2.6, "proteina_por_g": 0.04, "gordura_por_g": 0.01, "carb_por_g": 0.8},
+        "legumes_variados": {"kcal_por_g": 0.25, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.05},
+        "frutas_variadas": {"kcal_por_g": 0.48, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.12},
+        "gelatina_diet": {"kcal_por_g": 0.1, "proteina_por_g": 0.02, "gordura_por_g": 0.0, "carb_por_g": 0.0},
+        "pao_sirio_integral": {"kcal_por_g": 3.0, "proteina_por_g": 0.1, "gordura_por_g": 0.02, "carb_por_g": 0.6},
+        "molho_de_tomate": {"kcal_por_g": 0.5, "proteina_por_g": 0.02, "gordura_por_g": 0.0, "carb_por_g": 0.1},
+        "peito_de_peru": {"kcal_por_g": 1.7, "proteina_por_g": 0.25, "gordura_por_g": 0.07, "carb_por_g": 0.0},
+        "champignon": {"kcal_por_g": 0.22, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.03},
+        "creme_de_leite_light": {"kcal_por_g": 1.5, "proteina_por_g": 0.02, "gordura_por_g": 0.12, "carb_por_g": 0.03},
+        "mostarda": {"kcal_por_g": 1.0, "proteina_por_g": 0.05, "gordura_por_g": 0.07, "carb_por_g": 0.03},
+        "ketchup": {"kcal_por_g": 1.2, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.25},
+        "pao_de_hamburguer_integral": {"kcal_por_g": 2.2, "proteina_por_g": 0.08, "gordura_por_g": 0.03, "carb_por_g": 0.4},
+        "patinho_moido": {"kcal_por_g": 1.8, "proteina_por_g": 0.2, "gordura_por_g": 0.1, "carb_por_g": 0.0},
+        "molho_especial": {"kcal_por_g": 3.0, "proteina_por_g": 0.01, "gordura_por_g": 0.25, "carb_por_g": 0.1},
+        "salmao_fresco_grelhado": {"kcal_por_g": 2.0, "proteina_por_g": 0.2, "gordura_por_g": 0.13, "carb_por_g": 0.0},
+        "brocolis": {"kcal_por_g": 0.25, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.05},
+        "abobrinha": {"kcal_por_g": 0.16, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.03},
+        "limao": {"kcal_por_g": 0.3, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.09},
+        "ervas_finas": {"kcal_por_g": 0.6, "proteina_por_g": 0.03, "gordura_por_g": 0.01, "carb_por_g": 0.1},
+        "claras": {"kcal_por_g": 0.34, "proteina_por_g": 0.11, "gordura_por_g": 0.0, "carb_por_g": 0.0},
+        "espinafre": {"kcal_por_g": 0.23, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.04},
+        "tomate_cereja": {"kcal_por_g": 0.17, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.04},
+        "tilapia": {"kcal_por_g": 1.2, "proteina_por_g": 0.26, "gordura_por_g": 0.02, "carb_por_g": 0.0},
+        "cebola": {"kcal_por_g": 0.4, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.09},
+        "pimentao": {"kcal_por_g": 0.26, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.06},
+        "tortilha_integral": {"kcal_por_g": 2.6, "proteina_por_g": 0.08, "gordura_por_g": 0.05, "carb_por_g": 0.5},
+        "frango_desfiado": {"kcal_por_g": 1.65, "proteina_por_g": 0.31, "gordura_por_g": 0.04, "carb_por_g": 0.0},
+        "cream_cheese_light": {"kcal_por_g": 2.0, "proteina_por_g": 0.06, "gordura_por_g": 0.18, "carb_por_g": 0.03},
+        "alface_americana": {"kcal_por_g": 0.13, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.02},
+        "tomate": {"kcal_por_g": 0.17, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.04},
+        "quinoa": {"kcal_por_g": 3.6, "proteina_por_g": 0.14, "gordura_por_g": 0.06, "carb_por_g": 0.64},
+        "cogumelos_variados": {"kcal_por_g": 0.22, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.03},
+        "caldo_de_legumes": {"kcal_por_g": 0.05, "proteina_por_g": 0.0, "gordura_por_g": 0.0, "carb_por_g": 0.01},
+        "queijo_parmesao": {"kcal_por_g": 4.0, "proteina_por_g": 0.35, "gordura_por_g": 0.28, "carb_por_g": 0.03},
+        "banana_nanica": {"kcal_por_g": 0.9, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.23},
+        "leite_desnatado": {"kcal_por_g": 0.34, "proteina_por_g": 0.03, "gordura_por_g": 0.0, "carb_por_g": 0.05},
+        "iogurte_grego_natural": {"kcal_por_g": 0.9, "proteina_por_g": 0.1, "gordura_por_g": 0.0, "carb_por_g": 0.07},
+        "granola_caseira": {"kcal_por_g": 4.3, "proteina_por_g": 0.1, "gordura_por_g": 0.15, "carb_por_g": 0.6},
+        "frutas_vermelhas": {"kcal_por_g": 0.4, "proteina_por_g": 0.01, "gordura_por_g": 0.0, "carb_por_g": 0.1},
+        "pasta_de_amendoim": {"kcal_por_g": 6.2, "proteina_por_g": 0.25, "gordura_por_g": 0.5, "carb_por_g": 0.15},
+        "agua_de_coco": {"kcal_por_g": 0.27, "proteina_por_g": 0.0, "gordura_por_g": 0.0, "carb_por_g": 0.06},
+        "leite_condensado_diet": {"kcal_por_g": 2.0, "proteina_por_g": 0.05, "gordura_por_g": 0.05, "carb_por_g": 0.4},
+        "coco_ralado": {"kcal_por_g": 6.6, "proteina_por_g": 0.07, "gordura_por_g": 0.65, "carb_por_g": 0.24},
+        "aveia_em_flocos": {"kcal_por_g": 3.8, "proteina_por_g": 0.13, "gordura_por_g": 0.07, "carb_por_g": 0.66},
+        "mel": {"kcal_por_g": 3.0, "proteina_por_g": 0.0, "gordura_por_g": 0.0, "carb_por_g": 0.8},
     }
 
 def get_recipes():
-    """Receitas padrão do método Pedro Barros"""
+    # Adicione todas as receitas de 'substituicoes_jantar_padrao(1).txt'
+    # e 'substituicoes_lanche_padrao(1).txt' aqui, com seus macros detalhados.
     return {
-        # HAMBÚRGUER ARTESANAL (PADRÃO)
         "hamburguer_artesanal": {
-            "nome": "Hambúrguer Artesanal Completo",
-            "kcal": 536,
-            "proteina_g": 35,
-            "carb_g": 52,
-            "gordura_g": 18,
+            "kcal": 780,
+            "proteina_g": 42,
+            "carb_g": 38,
+            "gordura_g": 48,
             "itens": [
-                {"item": "Pão de hambúrguer", "qtd": 1, "unidade": "unidade", "kcal": 180},
-                {"item": "Patinho moído", "qtd": 120, "unidade": "g", "kcal": 245},
-                {"item": "Queijo mussarela", "qtd": 30, "unidade": "g", "kcal": 84},
-                {"item": "Molho especial", "qtd": 15, "unidade": "g", "kcal": 22},
-                {"item": "Alface e tomate", "qtd": 40, "unidade": "g", "kcal": 5}
+                {"item": "patinho_moido", "qtd": 120, "unidade": "g"},
+                {"item": "pao_de_hamburguer_integral", "qtd": 1, "unidade": "un"},
+                {"item": "queijo_mussarela", "qtd": 30, "unidade": "g"},
+                {"item": "molho_especial", "qtd": 15, "unidade": "g"},
+                {"item": "alface_americana", "qtd": 20, "unidade": "g"},
+                {"item": "tomate", "qtd": 30, "unidade": "g"}
             ]
         },
-        
-        # STROGONOFF LIGHT
-        "strogonoff_light": {
-            "nome": "Strogonoff Light de Frango",
-            "kcal": 374,
-            "proteina_g": 38,
-            "carb_g": 24,
+        "pizza_fake_integral": {
+            "kcal": 322,
+            "proteina_g": 33,
+            "carb_g": 28,
+            "gordura_g": 10,
+            "itens": [
+                {"item": "pao_sirio_integral", "qtd": 1, "unidade": "un"},
+                {"item": "molho_de_tomate", "qtd": 30, "unidade": "g"},
+                {"item": "queijo_mussarela", "qtd": 40, "unidade": "g"},
+                {"item": "peito_de_peru", "qtd": 50, "unidade": "g"}
+            ]
+        },
+        "strogonoff_light_de_frango": {
+            "kcal": 261,
+            "proteina_g": 40,
+            "carb_g": 10,
+            "gordura_g": 7,
+            "itens": [
+                {"item": "file_de_frango_grelhado", "qtd": 120, "unidade": "g"},
+                {"item": "champignon", "qtd": 50, "unidade": "g"},
+                {"item": "creme_de_leite_light", "qtd": 30, "unidade": "g"},
+                {"item": "mostarda", "qtd": 5, "unidade": "g"},
+                {"item": "ketchup", "qtd": 10, "unidade": "g"}
+            ]
+        },
+        "salmao_grelhado_com_legumes": {
+            "kcal": 344,
+            "proteina_g": 26,
+            "carb_g": 10,
+            "gordura_g": 24,
+            "itens": [
+                {"item": "salmao_fresco_grelhado", "qtd": 130, "unidade": "g"},
+                {"item": "brocolis", "qtd": 100, "unidade": "g"},
+                {"item": "abobrinha", "qtd": 80, "unidade": "g"},
+                {"item": "azeite_extra_virgem", "qtd": 5, "unidade": "ml"},
+                {"item": "limao", "qtd": 10, "unidade": "g"},
+                {"item": "ervas_finas", "qtd": 5, "unidade": "g"}
+            ]
+        },
+        "omelete_de_forno_recheada": {
+            "kcal": 310,
+            "proteina_g": 30,
+            "carb_g": 5,
+            "gordura_g": 20,
+            "itens": [
+                {"item": "ovo_de_galinha_inteiro", "qtd": 3, "unidade": "un"},
+                {"item": "claras", "qtd": 2, "unidade": "un"},
+                {"item": "queijo_cottage", "qtd": 50, "unidade": "g"},
+                {"item": "espinafre", "qtd": 40, "unidade": "g"},
+                {"item": "tomate_cereja", "qtd": 30, "unidade": "g"}
+            ]
+        },
+        "peixe_assado_com_batata_doce": {
+            "kcal": 311,
+            "proteina_g": 36,
+            "carb_g": 30,
+            "gordura_g": 10,
+            "itens": [
+                {"item": "tilapia", "qtd": 140, "unidade": "g"},
+                {"item": "batata_doce", "qtd": 100, "unidade": "g"},
+                {"item": "cebola", "qtd": 30, "unidade": "g"},
+                {"item": "pimentao", "qtd": 40, "unidade": "g"},
+                {"item": "azeite_extra_virgem", "qtd": 5, "unidade": "ml"}
+            ]
+        },
+        "wrap_de_frango_integral": {
+            "kcal": 370,
+            "proteina_g": 35,
+            "carb_g": 30,
             "gordura_g": 12,
             "itens": [
-                {"item": "Filé-mignon", "qtd": 100, "unidade": "g", "kcal": 204},
-                {"item": "Ketchup", "qtd": 10, "unidade": "g", "kcal": 10},
-                {"item": "Mostarda", "qtd": 10, "unidade": "g", "kcal": 8},
-                {"item": "Arroz branco (cozido)", "qtd": 75, "unidade": "g", "kcal": 94},
-                {"item": "Champignon", "qtd": 50, "unidade": "g", "kcal": 12},
-                {"item": "Creme de Leite Light", "qtd": 40, "unidade": "g", "kcal": 46}
+                {"item": "tortilha_integral", "qtd": 1, "unidade": "un"},
+                {"item": "frango_desfiado", "qtd": 100, "unidade": "g"},
+                {"item": "cream_cheese_light", "qtd": 20, "unidade": "g"},
+                {"item": "alface_americana", "qtd": 20, "unidade": "g"},
+                {"item": "tomate", "qtd": 30, "unidade": "g"}
             ]
         },
-        
-        # PANQUECA PROTEICA (LANCHE PADRÃO)
-        "panqueca_proteica": {
-            "nome": "Panqueca de Banana com Whey",
-            "kcal": 247,
-            "proteina_g": 27,
+        "risotto_de_quinoa_com_cogumelos": {
+            "kcal": 344,
+            "proteina_g": 18,
+            "carb_g": 50,
+            "gordura_g": 10,
+            "itens": [
+                {"item": "quinoa", "qtd": 60, "unidade": "g"},
+                {"item": "cogumelos_variados", "qtd": 80, "unidade": "g"},
+                {"item": "caldo_de_legumes", "qtd": 200, "unidade": "ml"},
+                {"item": "queijo_parmesao", "qtd": 15, "unidade": "g"},
+                {"item": "cebola", "qtd": 20, "unidade": "g"}
+            ]
+        },
+        "panqueca_de_banana": {
+            "kcal": 264,
+            "proteina_g": 30,
+            "carb_g": 25,
+            "gordura_g": 7,
+            "itens": [
+                {"item": "banana_nanica", "qtd": 60, "unidade": "g"},
+                {"item": "ovo_de_galinha_inteiro", "qtd": 1, "unidade": "un"},
+                {"item": "whey_protein", "qtd": 35, "unidade": "g"}
+            ]
+        },
+        "crepioca_proteica": {
+            "kcal": 264,
+            "proteina_g": 18,
+            "carb_g": 30,
+            "gordura_g": 10,
+            "itens": [
+                {"item": "tapioca_seca", "qtd": 30, "unidade": "g"},
+                {"item": "ovo_de_galinha_inteiro", "qtd": 1, "unidade": "un"},
+                {"item": "claras", "qtd": 2, "unidade": "un"},
+                {"item": "requeijao_light", "qtd": 15, "unidade": "g"}
+            ]
+        },
+        "vitamina_proteica": {
+            "kcal": 262,
+            "proteina_g": 30,
             "carb_g": 25,
             "gordura_g": 5,
             "itens": [
-                {"item": "Banana", "qtd": 60, "unidade": "g", "kcal": 55},
-                {"item": "Ovo inteiro", "qtd": 1, "unidade": "unidade", "kcal": 70},
-                {"item": "Whey Protein", "qtd": 20, "unidade": "g", "kcal": 81},
-                {"item": "Cacau em Pó 100%", "qtd": 10, "unidade": "g", "kcal": 28},
-                {"item": "Canela em pó", "qtd": 5, "unidade": "g", "kcal": 13}
+                {"item": "leite_desnatado", "qtd": 200, "unidade": "ml"},
+                {"item": "whey_protein", "qtd": 35, "unidade": "g"},
+                {"item": "banana_nanica", "qtd": 60, "unidade": "g"}
             ]
         },
-        
-        # CREPIOCA
-        "crepioca": {
-            "nome": "Crepioca Proteica",
-            "kcal": 210,
-            "proteina_g": 19,
-            "carb_g": 18,
-            "gordura_g": 6,
+        "iogurte_com_granola": {
+            "kcal": 284,
+            "proteina_g": 15,
+            "carb_g": 40,
+            "gordura_g": 10,
             "itens": [
-                {"item": "Tapioca seca", "qtd": 20, "unidade": "g", "kcal": 68},
-                {"item": "Ovo inteiro", "qtd": 1, "unidade": "unidade", "kcal": 70},
-                {"item": "Clara de ovo", "qtd": 2, "unidade": "unidade", "kcal": 34},
-                {"item": "Requeijão Light", "qtd": 20, "unidade": "g", "kcal": 38}
+                {"item": "iogurte_grego_natural", "qtd": 150, "unidade": "g"},
+                {"item": "granola_caseira", "qtd": 30, "unidade": "g"},
+                {"item": "frutas_vermelhas", "qtd": 50, "unidade": "g"}
+            ]
+        },
+        "pao_integral_com_pasta": {
+            "kcal": 300,
+            "proteina_g": 15,
+            "carb_g": 35,
+            "gordura_g": 12,
+            "itens": [
+                {"item": "pao_de_forma_integral", "qtd": 2, "unidade": "fatia"},
+                {"item": "pasta_de_amendoim", "qtd": 20, "unidade": "g"},
+                {"item": "banana_nanica", "qtd": 40, "unidade": "g"}
+            ]
+        },
+        "smoothie_verde": {
+            "kcal": 254,
+            "proteina_g": 30,
+            "carb_g": 20,
+            "gordura_g": 5,
+            "itens": [
+                {"item": "espinafre", "qtd": 30, "unidade": "g"},
+                {"item": "abacaxi", "qtd": 80, "unidade": "g"},
+                {"item": "whey_protein", "qtd": 35, "unidade": "g"},
+                {"item": "agua_de_coco", "qtd": 150, "unidade": "ml"}
+            ]
+        },
+        "tapioca_doce": {
+            "kcal": 250,
+            "proteina_g": 5,
+            "carb_g": 50,
+            "gordura_g": 5,
+            "itens": [
+                {"item": "tapioca_seca", "qtd": 40, "unidade": "g"},
+                {"item": "leite_condensado_diet", "qtd": 20, "unidade": "g"},
+                {"item": "coco_ralado", "qtd": 10, "unidade": "g"},
+                {"item": "canela_em_po", "qtd": 2, "unidade": "g"}
+            ]
+        },
+        "mingau_de_aveia": {
+            "kcal": 238,
+            "proteina_g": 10,
+            "carb_g": 40,
+            "gordura_g": 5,
+            "itens": [
+                {"item": "aveia_em_flocos", "qtd": 40, "unidade": "g"},
+                {"item": "leite_desnatado", "qtd": 150, "unidade": "ml"},
+                {"item": "mel", "qtd": 10, "unidade": "g"},
+                {"item": "canela_em_po", "qtd": 2, "unidade": "g"}
             ]
         }
-    }
-
-def get_meal_templates():
-    """Templates de refeições padrão"""
-    return {
-        # LANCHES PADRÃO (6 opções)
-        "lanches_padrao": [
-            {
-                "nome": "Panqueca de Banana",
-                "kcal": 264,
-                "proteina_g": 29,
-                "carb_g": 26,
-                "gordura_g": 5
-            },
-            {
-                "nome": "Crepioca Proteica",
-                "kcal": 264,
-                "proteina_g": 23,
-                "carb_g": 20,
-                "gordura_g": 8
-            },
-            {
-                "nome": "Vitamina Proteica",
-                "kcal": 262,
-                "proteina_g": 30,
-                "carb_g": 28,
-                "gordura_g": 3
-            },
-            {
-                "nome": "Iogurte com Granola",
-                "kcal": 284,
-                "proteina_g": 12,
-                "carb_g": 35,
-                "gordura_g": 10
-            },
-            {
-                "nome": "Pão Integral com Pasta",
-                "kcal": 300,
-                "proteina_g": 14,
-                "carb_g": 34,
-                "gordura_g": 12
-            },
-            {
-                "nome": "Shake Proteico Pronto",
-                "kcal": 165,
-                "proteina_g": 25,
-                "carb_g": 12,
-                "gordura_g": 2
-            }
-        ],
-        
-        # JANTARES PADRÃO (4 opções principais)
-        "jantares_padrao": [
-            {
-                "nome": "Pizza Fake Integral",
-                "kcal": 372,
-                "proteina_g": 35,
-                "carb_g": 38,
-                "gordura_g": 10
-            },
-            {
-                "nome": "Strogonoff Light de Frango",
-                "kcal": 271,
-                "proteina_g": 32,
-                "carb_g": 21,
-                "gordura_g": 8
-            },
-            {
-                "nome": "Hambúrguer Artesanal Completo",
-                "kcal": 536,
-                "proteina_g": 35,
-                "carb_g": 52,
-                "gordura_g": 18
-            },
-            {
-                "nome": "Salmão Grelhado com Legumes",
-                "kcal": 346,
-                "proteina_g": 38,
-                "carb_g": 8,
-                "gordura_g": 18
-            }
-        ],
-        
-        # CEIA PADRÃO (sempre fixa)
-        "ceia_padrao": {
-            "nome": "Ceia Padrão",
-            "componentes": [
-                "Whey Protein (15-35g)",
-                "Iogurte natural (100-150g)",
-                "Fruta (exceto banana/abacate) (75-100g)",
-                "Fibra: Chia ou psyllium (5-10g)"
-            ]
-        }
-    }
-
-def get_substitution_rules():
-    """Regras de substituição do método Pedro Barros"""
-    return {
-        "proteinas": {
-            "base": "file_de_frango_grelhado",
-            "substitutos": [
-                "Carne Vermelha Magra (patinho, acém, alcatra, filé mignon)",
-                "Filé Suíno (pernil, mignon, lombo)",
-                "Salmão ou Atum Fresco",
-                "Peixe Branco",
-                "Camarão Cozido"
-            ]
-        },
-        "carboidratos": {
-            "base": "arroz_branco_cozido",
-            "equivalencias": {
-                "100g arroz": [
-                    "200g batata inglesa",
-                    "140g batata doce",
-                    "100g aipim",
-                    "100g macarrão",
-                    "100g inhame"
-                ]
-            }
-        },
-        "leguminosas": {
-            "base": "feijao_cozido",
-            "substitutos": [
-                "Lentilha",
-                "Grão de bico",
-                "Ervilha",
-                "Milho cozido"
-            ]
-        },
-        "legumes_variados": [
-            "Tomate", "Beringela", "Alho Poró", "Maxixe", "Brócolis",
-            "Rabanete", "Chuchu", "Couve", "Beterraba", "Pepino",
-            "Couve Flor", "Abobrinha", "Repolho", "Palmito", "Quiabo",
-            "Cenoura", "Vagem", "Jiló"
-        ]
     }
