@@ -1,27 +1,21 @@
 from flask import Flask, request, jsonify
-from planner import create_meal_plan
 
 app = Flask(__name__)
 
+# Rota padrão (verificar se a API está no ar)
 @app.route('/')
-def index():
+def status():
     return "API do Plano Alimentar está funcionando!"
 
-@app.route('/create_plan', methods=['POST'])
-def handle_create_plan():
-    data = request.json
+# Nova rota que gera um plano alimentar
+@app.route('/gerarPlano', methods=['POST'])
+def gerar_plano():
+    dados = request.get_json()
+    objetivo = dados.get("objetivo", "não informado")
+    restricoes = dados.get("restricoes", "nenhuma")
 
-    if not data or "goals" not in data:
-        return jsonify({"error": "Dados de metas ausentes"}), 400
+    plano = f"Plano para o objetivo '{objetivo}', com restrições: {restricoes}."
+    return jsonify({ "plano": plano })
 
-    try:
-        plan = create_meal_plan(data["goals"])
-        return jsonify({
-            "function_name": "CreateMealPlan",
-            "result": plan
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+if __name__ == '__main__':
+    app.run()
