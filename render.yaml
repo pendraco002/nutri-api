@@ -10,13 +10,5 @@ services:
     envVars:
       - key: PYTHONUNBUFFERED
         value: "true"
-      - key: STRICT_VALIDATION
-        value: "true"
-      - key: ENFORCE_GRAMATURA
-        value: "true"
-      - key: MAX_NUTRITIONAL_DEVIATION
-        value: "5"
-      - key: DEFAULT_PORTION_WEIGHT_RULES
-        value: '{"proteina":100,"carboidrato":60,"vegetal":80,"fruta":100,"gordura":10}'
-    healthCheckPath: /health
-    healthCheckTimeout: 5
+      - key: NUTRI_API_KEY
+        value: "chave_secreta_para_acessar_api"
