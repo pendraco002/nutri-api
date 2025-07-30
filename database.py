@@ -1,96 +1,96 @@
-# Arquivo: database.py (Versão Final)
+# Arquivo: database.py (Versão Pedro Barros)
 
 def get_food_data():
-    """ Retorna dados nutricionais básicos por grama ou unidade. """
+    """ Retorna dados nutricionais básicos. """
     return {
-        "ovo_inteiro": {"kcal": 70, "proteina_g": 6, "carb_g": 0.5, "gordura_g": 5},
-        "clara_de_ovo": {"kcal": 17, "proteina_g": 4, "carb_g": 0.2, "gordura_g": 0},
-        "whey_protein": {"kcal_por_g": 4.0, "proteina_por_g": 0.8},
+        "ovo_inteiro": {"kcal": 70},
+        "clara_de_ovo": {"kcal": 17},
+        "whey_protein": {"kcal_por_g": 4.0},
         "pao_integral": {"kcal_por_fatia": 70},
         "arroz_branco_cozido": {"kcal_por_g": 1.3},
-        "file_de_frango_grelhado": {"kcal_por_g": 1.65, "proteina_por_g": 0.31},
+        "file_de_frango_grelhado": {"kcal_por_g": 1.65},
         "batata_doce_cozida": {"kcal_por_g": 0.86},
         "azeite_extra_virgem": {"kcal_por_g": 8.8},
         "iogurte_desnatado": {"kcal_por_g": 0.55},
         "chia_em_graos": {"kcal_por_g": 4.8},
-        "frutas_vermelhas": {"kcal_por_g": 0.5},
-        "banana": {"kcal_por_unidade": 90},
+        "frutas_gerais": {"kcal_por_g": 0.5},
+        "banana": {"kcal": 90},
         "tapioca_seca": {"kcal_por_g": 3.4},
         "requeijao_light": {"kcal_por_g": 1.8},
         "patinho_moido_grelhado": {"kcal_por_g": 2.05},
         "queijo_mussarela": {"kcal_por_g": 3.0},
         "salmao_grelhado": {"kcal_por_g": 2.06},
         "tilapia_grelhada": {"kcal_por_g": 1.20},
-        "pao_de_hamburguer": {"kcal_por_unidade": 180},
+        "pao_de_hamburguer": {"kcal": 195},
         "molho_de_tomate": {"kcal_por_g": 0.5},
-        "peito_de_peru": {"kcal_por_g": 1.7}
+        "peito_de_peru": {"kcal_por_g": 1.7},
+        "cacau_po": {"kcal_por_g": 2.8},
+        "canela_po": {"kcal_por_g": 2.4}
     }
 
-def get_standard_recipes():
-    """ Retorna um dicionário de receitas padronizadas para substituições. """
+def get_pedro_barros_recipes():
+    """ Retorna as receitas específicas e obrigatórias do padrão. """
     return {
         "lanche": [
             {
-                "nome": "Panqueca de Banana Proteica",
-                "kcal": 285,
-                "itens": "1 Banana, 1 Ovo, 20g de Whey Protein. Misturar tudo e grelhar."
+                "nome": "Panqueca Proteica",
+                "itens": [
+                    {"item": "Banana", "medida": "Grama", "qtd": 60, "kcal": 55},
+                    {"item": "Ovo de galinha", "medida": "Unidade", "qtd": 1, "kcal": 70},
+                    {"item": "Whey Protein", "medida": "Grama", "qtd": 20, "kcal": 81},
+                    {"item": "Cacau em Pó 100%", "medida": "Grama", "qtd": 10, "kcal": 28},
+                    {"item": "Canela em pó", "medida": "Grama", "qtd": 5, "kcal": 13}
+                ],
+                "obs": "Basta misturar tudo e jogar na frigideira ou fazer um bolinho no micro-ondas."
             },
             {
-                "nome": "Crepioca Recheada",
-                "kcal": 260,
-                "itens": "30g de Tapioca, 1 Ovo, 2 Claras, 30g de Queijo Cottage. Fazer a crepioca e rechear."
+                "nome": "Crepioca",
+                "itens": [
+                    {"item": "Tapioca seca", "medida": "Grama", "qtd": 20, "kcal": 68},
+                    {"item": "Ovo de galinha", "medida": "Unidade", "qtd": 1, "kcal": 70},
+                    {"item": "Clara de ovo de galinha", "medida": "Unidade", "qtd": 2, "kcal": 34},
+                    {"item": "Requeijão Light", "medida": "Grama", "qtd": 20, "kcal": 38}
+                ],
+                "obs": "Fazer Crepioca."
             },
-            {
-                "nome": "Vitamina Hipercalórica",
-                "kcal": 310,
-                "itens": "1 Banana, 30g de Aveia, 20g de Pasta de Amendoim, 200ml de Leite (ou vegetal)."
-            },
-            {
-                "nome": "Sanduíche de Frango",
-                "kcal": 300,
-                "itens": "2 fatias de Pão Integral, 80g de Frango desfiado, 30g de Requeijão Light."
-            },
-            {
-                "nome": "Bowl de Açaí Proteico (sem xarope)",
-                "kcal": 320,
-                "itens": "150g de Polpa de Açaí, 1 Banana, 20g de Whey Protein."
-            },
-            {
-                "nome": "Ovos Mexidos com Batata Doce",
-                "kcal": 290,
-                "itens": "2 Ovos inteiros, 100g de Batata Doce cozida em cubos."
-            }
+            # Adicionar mais 4 receitas de lanche para totalizar 6
+            {"nome": "Vitamina Simples", "itens": [{"item": "Fruta", "medida": "Grama", "qtd": 150, "kcal": 75}, {"item": "Whey Protein", "medida": "Grama", "qtd": 30, "kcal": 120}], "obs": "Bater tudo no liquidificador."},
+            {"nome": "Iogurte Proteico", "itens": [{"item": "Iogurte Desnatado", "medida": "Grama", "qtd": 170, "kcal": 94}, {"item": "Whey Protein", "medida": "Grama", "qtd": 20, "kcal": 80}], "obs": "Misturar bem."},
+            {"nome": "Sanduíche Leve", "itens": [{"item": "Pão Integral", "medida": "Fatia", "qtd": 2, "kcal": 140}, {"item": "Peito de Peru", "medida": "Grama", "qtd": 50, "kcal": 85}], "obs": "Montar o sanduíche."},
+            {"nome": "Ovos com Torrada", "itens": [{"item": "Ovo de galinha", "medida": "Unidade", "qtd": 2, "kcal": 140}, {"item": "Pão Integral", "medida": "Fatia", "qtd": 1, "kcal": 70}], "obs": "Pode cozinhar ou fritar os ovos sem gordura."}
         ],
         "jantar": [
             {
-                "nome": "Pizza Fake Integral",
-                "kcal": 450,
-                "itens": "1 Pão Sírio Integral (ou Rap10), 40g de Molho de Tomate, 60g de Queijo Mussarela, 50g de Peito de Peru."
+                "nome": "Strogonoff Light",
+                "itens": [
+                    {"item": "Filé-mignon Cozido(a)", "medida": "Grama", "qtd": 100, "kcal": 204},
+                    {"item": "Ketchup", "medida": "Grama", "qtd": 10, "kcal": 10},
+                    {"item": "Mostarda", "medida": "Grama", "qtd": 10, "kcal": 8},
+                    {"item": "Arroz branco (cozido)", "medida": "Grama", "qtd": 75, "kcal": 94},
+                    {"item": "Champignon (cogumelo paris)", "medida": "Grama", "qtd": 50, "kcal": 13},
+                    {"item": "Creme de Leite Light", "medida": "Grama", "qtd": 40, "kcal": 46}
+                ]
             },
             {
-                "nome": "Hambúrguer Artesanal Fit",
-                "kcal": 550,
-                "itens": "1 Pão de Hambúrguer, 120g de Patinho moído, 30g de Queijo, Salada a gosto."
+                "nome": "Hambúrguer Artesanal",
+                "itens": [
+                    {"item": "Pão de hambúrguer", "medida": "Unidade", "qtd": 1, "kcal": 195},
+                    {"item": "Carne de Hambúrguer (Patinho 120g Cru)", "medida": "Unidade", "qtd": 1, "kcal": 199},
+                    {"item": "Queijo tipo mussarela", "medida": "Grama", "qtd": 20, "kcal": 56},
+                    {"item": "Ketchup/Mostarda/Maionese Light", "medida": "Colher de sopa", "qtd": 1, "kcal": 15}
+                ]
             },
-            {
-                "nome": "Salmão Grelhado com Purê",
-                "kcal": 520,
-                "itens": "150g de Salmão, 200g de Batata Doce (para o purê), Legumes."
-            },
-            {
-                "nome": "Omelete de Forno Completo",
-                "kcal": 480,
-                "itens": "3 Ovos, 50g de Queijo, 50g de Frango desfiado, Legumes variados."
-            }
+            # Adicionar mais 2 receitas de jantar para totalizar 4
+            {"nome": "Pizza Fake", "itens": [{"item": "Pão Sírio Integral", "medida": "Unidade", "qtd": 1, "kcal": 150}, {"item": "Molho de Tomate", "medida": "Grama", "qtd": 40, "kcal": 20}, {"item": "Queijo Mussarela", "medida": "Grama", "qtd": 60, "kcal": 180}]},
+            {"nome": "Salmão com Batata Doce", "itens": [{"item": "Salmão Grelhado", "medida": "Grama", "qtd": 150, "kcal": 309}, {"item": "Batata Doce Cozida", "medida": "Grama", "qtd": 200, "kcal": 172}]}
         ],
         "ceia": {
-            "nome": "Ceia Padrão",
-            "kcal": 180,
+            "kcal": 150, # Valor de exemplo
             "itens": [
-                {"item": "Iogurte Desnatado", "qtd": 150, "unidade": "g", "kcal": 82},
-                {"item": "Whey Protein", "qtd": 15, "unidade": "g", "kcal": 60},
-                {"item": "Chia em Grãos", "qtd": 5, "unidade": "g", "kcal": 24},
-                {"item": "Frutas Vermelhas", "qtd": 30, "unidade": "g", "kcal": 15}
+                {"item": "Whey Protein", "medida": "Gramas", "qtd": "15", "kcal": 60},
+                {"item": "Iogurte natural", "medida": "Gramas", "qtd": "100", "kcal": 55},
+                {"item": "Fruta (menos banana e abacate)", "medida": "Gramas", "qtd": "50", "kcal": 25},
+                {"item": "Fibra: Chia ou psyllium", "medida": "Gramas", "qtd": "5", "kcal": 10}
             ]
         }
     }
