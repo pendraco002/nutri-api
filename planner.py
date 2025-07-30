@@ -1,123 +1,119 @@
-# Arquivo: planner.py (Versão Final)
+# Arquivo: planner.py (Versão Pedro Barros)
 
-from database import get_food_data, get_standard_recipes
+from database import get_pedro_barros_recipes
 from datetime import datetime
 import random
 
 def format_meal_items(items):
-    """ Formata a lista de itens de uma refeição para texto. """
-    text = ""
+    """ Formata os itens de uma refeição com alinhamento. """
+    lines = []
     for item in items:
-        # Usamos tabs (\t) para tentar alinhar, mas o alinhamento perfeito depende da fonte.
-        # O espaçamento é uma forma de garantir a separação visual.
-        line = f"• {item['item']} ({item['unidade']}): {item['qtd']} {item['unidade']}\t\t\t[{item['kcal']} kcal]\n"
-        text += line
-    return text
+        # Cria a parte esquerda da linha
+        left_part = f"• {item['item']} ({item['medida']}: {item['qtd']})"
+        # Cria a parte direita da linha
+        right_part = f"[{item['kcal']} kcal]"
+        # Calcula o espaçamento necessário para o alinhamento
+        # O número 110 é um valor ajustado para tentar alinhar bem em fontes monoespaçadas.
+        # Pode precisar de ajuste dependendo da fonte de exibição.
+        spacing = " " * (110 - len(left_part) - len(right_part))
+        lines.append(f"{left_part}{spacing}{right_part}")
+    return "\n".join(lines)
 
-def format_substitutions(sub_list):
-    """ Formata a lista de substituições de uma refeição. """
+def format_substitutions(sub_list, type):
+    """ Formata a lista de substituições. """
     text = ""
-    for i, sub in enumerate(sub_list):
-        text += f"### Substituição {i+1} – {sub['nome']} ({sub['kcal']} kcal)\n"
-        text += f"• {sub['itens']}\n\n"
+    if type == "lanche":
+        for i, sub in enumerate(sub_list):
+            total_kcal = sum(item['kcal'] for item in sub['itens'])
+            text += f"### Substituição {i+1}{' ' * 95}Kcal\n"
+            text += f"{format_meal_items(sub['itens'])}\n"
+            if sub.get('obs'):
+                text += f"Obs: {sub['obs']}\n"
+            text += "\n"
+    elif type == "jantar":
+        for i, sub in enumerate(sub_list):
+            total_kcal = sum(item['kcal'] for item in sub['itens'])
+            text += f"### Substituição {i+1} – {sub['nome']}{' ' * (80 - len(sub['nome']))}Kcal\n"
+            text += f"{format_meal_items(sub['itens'])}\n\n"
     return text
 
-def create_formatted_plan(objetivo, restricoes):
+def create_pedro_barros_plan(user_name="[NOME COMPLETO DO PACIENTE]"):
     """
-    Cria o plano alimentar completo como uma única string de texto formatada,
-    seguindo os padrões "Pedro Barros".
+    Gera o plano alimentar completo no formato exato de Pedro Barros.
     """
-    # Simulação de cálculo de metas - em um sistema real, isso seria mais complexo
-    # e usaria os inputs 'objetivo' e 'restricoes'.
-    metas = {"cafe": 450, "almoco": 700, "lanche": 350, "jantar": 600}
-    
-    # Pega os dados e receitas do nosso banco de dados
-    db = get_food_data()
-    recipes = get_standard_recipes()
+    recipes = get_pedro_barros_recipes()
+    data_atual = datetime.now().strftime("%d/%m/%Y")
 
-    # --- Montagem do Plano Fixo (Exemplo) ---
-    # Em um sistema real, os itens seriam selecionados dinamicamente.
-    
-    cafe_da_manha_itens = [
-        {"item": "Ovos mexidos", "qtd": 3, "unidade": "unid", "kcal": 210},
-        {"item": "Pão integral", "qtd": 2, "unidade": "fatias", "kcal": 140},
-        {"item": "Abacate", "qtd": 50, "unidade": "g", "kcal": 80}
-    ]
+    # --- Simulação de um plano principal ---
+    # Em um sistema real, estes itens seriam calculados dinamicamente.
+    cafe_da_manha = {"kcal": 450, "itens": [{"item": "Ovo de galinha", "medida": "Unidade", "qtd": 2, "kcal": 140}, {"item": "Pão de forma", "medida": "Fatia", "qtd": 2, "kcal": 140}, {"item": "Requeijão Light", "medida": "Grama", "qtd": 30, "kcal": 54}, {"item": "Mamão", "medida": "Grama", "qtd": 150, "kcal": 58}]}
+    almoco = {"kcal": 600, "itens": [{"item": "Filé de frango grelhado", "medida": "Grama", "qtd": 150, "kcal": 248}, {"item": "Arroz branco (cozido)", "medida": "Grama", "qtd": 120, "kcal": 156}, {"item": "Feijão cozido", "medida": "Concha", "qtd": 1, "kcal": 52}, {"item": "Legumes Variados", "medida": "Grama", "qtd": 150, "kcal": 38}]}
+    lanche_principal = {"kcal": 300, "itens": [{"item": "Iogurte Desnatado", "medida": "Grama", "qtd": 170, "kcal": 94}, {"item": "Whey Protein", "medida": "Grama", "qtd": 30, "kcal": 120}, {"item": "Banana", "medida": "Unidade", "qtd": 1, "kcal": 90}], "obs": "Misturar o whey no iogurte."}
+    jantar_principal = {"kcal": 500, "itens": [{"item": "Tilápia Grelhada", "medida": "Grama", "qtd": 200, "kcal": 240}, {"item": "Batata Doce Cozida", "medida": "Grama", "qtd": 200, "kcal": 172}, {"item": "Azeite Extra Virgem", "medida": "Grama", "qtd": 10, "kcal": 88}]}
+    ceia = recipes["ceia"]
 
-    almoco_itens = [
-        {"item": "Filé de frango grelhado", "qtd": 150, "unidade": "g", "kcal": 248},
-        {"item": "Arroz branco cozido", "qtd": 150, "unidade": "g", "kcal": 195},
-        {"item": "Batata doce cozida", "qtd": 200, "unidade": "g", "kcal": 172}
-    ]
-
-    lanche_principal_itens = [
-        {"item": "Iogurte Desnatado", "qtd": 200, "unidade": "g", "kcal": 110},
-        {"item": "Banana", "qtd": 1, "unidade": "unid", "kcal": 90},
-        {"item": "Whey Protein", "qtd": 30, "unidade": "g", "kcal": 120}
-    ]
-
-    jantar_principal_itens = [
-        {"item": "Tilápia Grelhada", "qtd": 200, "unidade": "g", "kcal": 240},
-        {"item": "Azeite Extra Virgem", "qtd": 10, "unidade": "g", "kcal": 88},
-        {"item": "Legumes no vapor", "qtd": 200, "unidade": "g", "kcal": 50}
-    ]
-
-    ceia_fixa = recipes["ceia"]
-
-    # Seleciona as substituições aleatoriamente (ou poderia ser uma lógica fixa)
+    # Seleciona as 6 substituições de lanche e 4 de jantar
     substituicoes_lanche = random.sample(recipes["lanche"], k=6)
     substituicoes_jantar = random.sample(recipes["jantar"], k=4)
 
     # --- Montagem da String Final ---
-    data_atual = datetime.now().strftime("%d/%m/%Y")
-    
-    # Usamos f-strings para montar o texto final com a formatação exata.
     plano_formatado = f"""
-Plano Alimentar
-[NOME DO PACIENTE]
-Data: {data_atual}
+                                                           Plano Alimentar
+                                                    {user_name}
+                                                         Data: {data_atual}
 
-Todos os dias
+
+
+Todos os dias  
 Dieta única
 
 ---
 
-## 🕗 08:00 – Café da Manhã ({metas['cafe']} kcal)
-{format_meal_items(cafe_da_manha_itens)}
+## 🕗 08:00 – Café da manhã{' ' * 95}Kcal
+{format_meal_items(cafe_da_manha['itens'])}
 Obs:*Substituições:*
-- Ovos por: 4 Claras de Ovo ou 100g de Tofu mexido.
-- Pão integral por: 2 fatias de Pão sem glúten ou 60g de Tapioca.
+- Pão de forma por: 40g de tapioca ou 2 biscoitos de arroz grandes ou 30g de aveia.
+- Requeijão Light por: Queijo minas ou cottage ou 25g de mussarela.
 
 ---
 
-## 🕛 12:30 – Almoço ({metas['almoco']} kcal)
-{format_meal_items(almoco_itens)}
-Obs:*Substituições:*
-- **Proteína** por: Patinho Moído (150g), Tilápia (200g), Salmão (120g).
-- **Carboidrato** por: Arroz Integral (150g), Mandioca (180g), Cuscuz (120g).
-- **Leguminosa** por: Feijão (1 concha), Lentilha (100g), Grão de Bico (100g).
-- ***Legumes Variados:*** Tomate, Chuchu, Abobrinha, Brócolis, Couve-Flor, etc.
+## 🕛 12:00 – Almoço{' ' * 102}Kcal
+{format_meal_items(almoco['itens'])}
+Obs:*Substituições:*  
+- Proteína por: Carne Vermelha Magra (120g) ou Peixe Branco (180g) ou Ovos (3 unidades).
+- Carboidrato por: Batata Inglesa (250g) ou Mandioca (150g) ou Macarrão (120g).
+- Feijão por: Lentilha ou grão de bico ou ervilha.
+- Legumes Variados: Tomate, Chuchu, Abobrinha, Brócolis, etc.  
 
 ---
 
-## 🕓 16:00 – Lanche da Tarde ({metas['lanche']} kcal)
-{format_meal_items(lanche_principal_itens)}
-
-{format_substitutions(substituicoes_lanche)}
----
-
-## 🕗 20:00 – Jantar ({metas['jantar']} kcal)
-{format_meal_items(jantar_principal_itens)}
-
-{format_substitutions(substituicoes_jantar)}
----
-
-## 🌙 22:00 – Ceia ({ceia_fixa['kcal']} kcal)
-{format_meal_items(ceia_fixa['itens'])}
+## 🕓 16:00 – Lanche da Tarde{' ' * 92}Kcal
+{format_meal_items(lanche_principal['itens'])}
+Obs: {lanche_principal['obs']}
 
 ---
 
-> Este documento é de uso exclusivo do destinatário e pode ter conteúdo confidencial.
+{format_substitutions(substituicoes_lanche, "lanche")}
+---
+
+## 🕗 20:00 – Jantar{' ' * 105}Kcal
+{format_meal_items(jantar_principal['itens'])}
+Obs:*Substituições:*  
+- Proteína por: Carne Vermelha Magra (150g) ou Salmão (120g) ou Frango (180g).
+- Carboidrato por: Arroz (100g) ou Mandioca (200g) ou Inhame (200g).
+- Legumes Variados: Tomate, Chuchu, Abobrinha, Brócolis, etc.  
+
+---
+
+{format_substitutions(substituicoes_jantar, "jantar")}
+---
+
+## 🌙 22:00 – Ceia{' ' * 109}Kcal
+{format_meal_items(ceia['itens'])}
+
+---
+
+> Este documento é de uso exclusivo do destinatário e pode ter conteúdo confidencial.  
 > Qualquer uso, cópia, divulgação ou distribuição não autorizada é estritamente proibido.
 """
     return plano_formatado
