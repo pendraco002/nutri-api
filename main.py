@@ -1,48 +1,43 @@
-# main.py (Versão de Produção v2.0)
+# main.py (Versão Final 11.0 - Com Segurança)
 
 from flask import Flask, request, jsonify
-from logic import generate_plan_logic
+from functools import wraps
 import os
-import logging
-
-# Configuração de logging
-logging.basicConfig(level=logging.INFO)
+from logic import generate_plan_logic
 
 app = Flask(__name__)
 
+# Carrega a chave secreta das variáveis de ambiente
+API_KEY = os.environ.get("NUTRI_API_KEY")
+
+# --- O "PASSE DE SEGURANÇA" (DECORATOR DE AUTENTICAÇÃO) ---
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Verifica se o header 'X-API-Key' foi enviado na requisição
+        if 'X-API-Key' in request.headers and request.headers['X-API-Key'] == API_KEY:
+            return f(*args, **kwargs)
+        else:
+            # Se a chave estiver errada ou ausente, rejeita a chamada
+            return jsonify({"erro": "Acesso não autorizado. Chave de API inválida ou ausente."}), 401
+    return decorated_function
+# ---------------------------------------------------------
+
 @app.route('/', methods=['GET'])
 def verificar_status():
-    """Endpoint para verificar a saúde da API."""
-    app.logger.info("Status check: OK")
-    return jsonify({"status": "NutriAPI Engine v2.0 está online e operacional."})
+    return jsonify({ "status": "NutriAPI Engine v11.0 (Blindada) está online e operacional." })
 
 @app.route('/gerarPlano', methods=['POST'])
-def gerar_plano_endpoint():
-    """Endpoint principal que recebe a chamada do GPT."""
-    app.logger.info("Recebida nova requisição para /gerarPlano")
+@require_api_key  # Aplica o "Passe de Segurança" a este endpoint
+def gerar_plano():
+    request_data = request.get_json()
+    if not request_data:
+        return jsonify({"erro": "Requisição JSON inválida ou vazia."}), 400
     
-    if not request.is_json:
-        app.logger.warning("Requisição recebida sem o content-type application/json.")
-        return jsonify({"erro": "Header 'Content-Type' deve ser 'application/json'."}), 415
-
-    try:
-        request_data = request.get_json()
-        app.logger.info(f"Payload recebido: {request_data}")
-        
-        # Chama o motor de lógica para processar os dados
-        response_data, status_code = generate_plan_logic(request_data)
-        
-        if status_code == 200:
-            app.logger.info("Plano gerado com sucesso.")
-        else:
-            app.logger.error(f"Erro na lógica de geração: {response_data.get('erro')}")
-            
-        return jsonify(response_data), status_code
-
-    except Exception as e:
-        app.logger.critical(f"Erro inesperado no servidor: {e}", exc_info=True)
-        return jsonify({"erro": "Ocorreu um erro interno inesperado no servidor."}), 500
+    # Chama a lógica principal para gerar o plano
+    response, status_code = generate_plan_logic(request_data)
+    return jsonify(response), status_code
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False) # Debug desativado para produção
+    app.run(host="0.0.0.0", port=port)
