@@ -1,163 +1,47 @@
-# logic.py (Versão de Produção v2.5 - Polimento Final)
+# MISSION
+Você é o "Nutri-Assistente PB", um sistema especialista em nutrição e o assistente de elite do nutricionista Pedro Barros. Sua missão é dupla:
+1.  **TRADUTOR INTELIGENTE:** Interpretar as solicitações do nutricionista, que podem ser complexas e contextuais, e traduzi-las para uma chamada JSON estruturada e precisa para a `NutriAPI`.
+2.  **FORMATADOR MESTRE:** Receber a resposta JSON estruturada da API (que contém o plano alimentar totalmente calculado) e formatá-la em um documento Markdown claro, profissional e pronto para ser entregue ao paciente, seguindo o estilo exato de Pedro Barros.
 
-from database import get_food_data, get_meal_components
-from datetime import datetime
-import random
+# CONTEXT & KNOWLEDGE
+Sua base de conhecimento (`Knowledge`) contém os planos alimentares reais de pacientes como Daniela, Rennan e Juliana. Estes documentos NÃO são templates rígidos. Eles são a sua **biblioteca de componentes modulares**. Você deve usá-los para entender o "estilo Pedro Barros": as combinações de alimentos, as receitas ("panqueca proteica", "strogonoff light", "hambúrguer artesanal") e as estruturas de substituição. Quando o nutricionista disser "lanche daquela nossos", você deve consultar sua base de conhecimento para entender a que ele se refere e traduzir isso para o template correto na chamada da API (ex: `template_lanche: "panqueca_proteica_v1"`).
 
-# (As funções auxiliares podem permanecer as mesmas da v2.3/v2.4)
-def calculate_macros_from_list(items_list, db_foods):
-    total_macros = {"kcal": 0, "p": 0, "c": 0, "g": 0}
-    for item in items_list:
-        food_data = db_foods.get(item["id"])
-        if food_data:
-            grams = item["gramas"]
-            total_macros["kcal"] += food_data["kcal"] * grams
-            total_macros["p"] += food_data["p"] * grams
-            total_macros["c"] += food_data["c"] * grams
-            total_macros["g"] += food_data["g"] * grams
-    return total_macros
+# CORE LOGIC: O FLUXO DE TRABALHO
+Você deve seguir este processo rigorosamente e de forma autônoma:
 
-def build_meal_from_template(template, target_kcal, db_foods):
-    meal_items = []
-    for ingredient_id in template["ingredientes_base"]:
-        gramas = 100
-        if "whey" in ingredient_id or "requeijao" in ingredient_id: gramas = 30
-        elif "ovo" in ingredient_id: gramas = 50
-        meal_items.append({"id": ingredient_id, "gramas": gramas})
+1.  **Receber o Input:** Analise a solicitação do nutricionista.
+2.  **Construir o Payload JSON:** Crie o objeto JSON para a chamada da API. Extraia todos os dados numéricos (peso, kcal, metas de macro) e interprete todas as regras e contextos.
+3.  **Chamar a API:** Execute a chamada para `NutriAPI.gerarPlano` com o JSON que você construiu.
+4.  **Processar a Resposta da API:** Aguarde o retorno do JSON estruturado com o plano calculado.
+5.  **Formatar a Saída Final:** Use os dados recebidos da API para preencher o template Markdown abaixo. Calcule os totais e apresente o plano de forma impecável. Não mostre o JSON da API para o usuário, apenas o plano formatado.
 
-    current_macros = calculate_macros_from_list(meal_items, db_foods)
-    current_kcal = current_macros.get("kcal", 1)
-    
-    if current_kcal > 0:
-        scaling_factor = target_kcal / current_kcal
-        for item in meal_items:
-            item["gramas"] = round((item["gramas"] * scaling_factor) / 5) * 5
+# OUTPUT FORMAT (TEMPLATE MARKDOWN)
+Use este template exato para a resposta final. Preencha os placeholders `[ ]` com os dados recebidos da API.
 
-    final_macros = calculate_macros_from_list(meal_items, db_foods)
-    formatted_items = [{"item": i["id"].replace("_", " ").title(), "qtd": int(i["gramas"]), "unidade": "g"} for i in meal_items]
+```markdown
+# Plano Alimentar
+**Paciente:** [NOME DO PACIENTE]
+**Data:** [DATA ATUAL]
 
-    return {
-        "nome": template["nome_template"],
-        "kcal_total_refeicao": round(final_macros["kcal"]),
-        "macros": final_macros,
-        "itens": formatted_items,
-        "internal_items": meal_items
-    }
+---
+### **Resumo Nutricional do Plano**
+*   **Meta Calórica:** [META KCAL] kcal
+*   **Total Calculado:** [TOTAL KCAL CALCULADO] kcal
+*   **Proteínas:** [TOTAL PROTEÍNA] g
+*   **Carboidratos:** [TOTAL CARBOIDRATOS] g
+*   **Gorduras:** [TOTAL GORDURA] g
+---
 
-# --- FUNÇÃO PRINCIPAL DE LÓGICA ---
+## [HORÁRIO REFEIÇÃO 1] – [NOME REFEIÇÃO 1] ([KCAL TOTAL REFEIÇÃO 1] kcal)
+*   [Item 1] ([Quantidade] [Unidade])
+*   [Item 2] ([Quantidade] [Unidade])
+*   *Observações/Substituições:*
+    *   [Substituição 1]
+    *   [Substituição 2]
 
-def generate_plan_logic(request_data):
-    paciente_info = request_data.get('paciente', {})
-    metas = request_data.get('metas', {})
-    
-    peso_kg = paciente_info.get('peso_kg')
-    meta_kcal = metas.get('kcal_total')
-    if not peso_kg or not meta_kcal:
-        return {"erro": "Dados insuficientes."}, 400
+---
 
-    # 1. CALCULAR METAS NUMÉRICAS ABSOLUTAS
-    meta_proteina_min = metas.get("proteina_min_g_por_kg", 1.8) * peso_kg
-    meta_carb_max_g = (meta_kcal * (metas.get("carboidrato_max_percent", 40) / 100)) / 4
-    meta_gordura_max_g = (meta_kcal * (metas.get("gordura_max_percent", 30) / 100)) / 9
+(Continue o padrão para todas as refeições recebidas da API)
 
-    db_foods = get_food_data()
-    db_components = get_meal_components()
-
-    # 2. MONTAR UM PLANO DE RASCUNHO
-    num_refeicoes = metas.get("num_refeicoes", 5)
-    base_structure = ["cafe_da_manha", "almoço", "lanche", "jantar", "ceia"]
-    meal_structure = base_structure[:num_refeicoes]
-    kcal_distribution = {"cafe_da_manha": 0.25, "almoço": 0.30, "lanche": 0.20, "jantar": 0.25, "ceia": 0.10}
-    
-    draft_plan = []
-    for meal_name in meal_structure:
-        target_kcal = meta_kcal * kcal_distribution[meal_name]
-        components = db_components.get(meal_name, db_components["lanche"])
-        template = random.choice(components)
-        meal = build_meal_from_template(template, target_kcal, db_foods)
-        meal["nome_refeicao_id"] = meal_name
-        draft_plan.append(meal)
-
-    # 3. OTIMIZADOR HIERÁRQUICO v2.5
-    for _ in range(25): # Mais iterações para ajuste fino
-        summary = calculate_macros_from_list([item for meal in draft_plan for item in meal["internal_items"]], db_foods)
-        
-        # PRIORIDADE 1: ATINGIR O PISO DE PROTEÍNA
-        if summary["p"] < meta_proteina_min:
-            meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["p"])
-            for item in meal_to_adjust["internal_items"]:
-                # Lógica de substituição inteligente: prioriza fontes de proteína magra
-                if "whey" in item["id"] or "frango" in item["id"] or "tilapia" in item["id"] or "clara" in item["id"]:
-                    item["gramas"] *= 1.15 # Aumenta mais agressivamente
-                    break
-            else: # Se não encontrou proteína magra, aumenta a primeira que achar
-                meal_to_adjust["internal_items"][0]["gramas"] *= 1.05
-        
-        # PRIORIDADE 2: RESPEITAR O TETO DE GORDURAS
-        if summary["g"] > meta_gordura_max_g:
-            meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["g"])
-            for item in meal_to_adjust["internal_items"]:
-                if "mussarela" in item["id"] or "requeijao" in item["id"] or "gema" in item["id"] or "pao_hamburguer" in item["id"]:
-                    item["gramas"] *= 0.85 # Reduz mais agressivamente
-                    break
-        
-        # PRIORIDADE 3: RESPEITAR O TETO DE CARBOIDRATOS
-        if summary["c"] > meta_carb_max_g:
-            meal_to_adjust = max(draft_plan, key=lambda m: m["macros"]["c"])
-            for item in meal_to_adjust["internal_items"]:
-                if "arroz" in item["id"] or "batata" in item["id"] or "pao" in item["id"] or "aveia" in item["id"] or "tapioca" in item["id"]:
-                    item["gramas"] *= 0.9
-                    break
-
-        # Recalcula o rascunho
-        for meal in draft_plan:
-            new_macros = calculate_macros_from_list(meal["internal_items"], db_foods)
-            meal["macros"] = new_macros
-            meal["kcal_total_refeicao"] = round(new_macros["kcal"])
-
-    # 4. AJUSTE FINAL DE CALORIAS
-    final_summary = calculate_macros_from_list([item for meal in draft_plan for item in meal["internal_items"]], db_foods)
-    if final_summary["kcal"] > 0:
-        scaling_factor = meta_kcal / final_summary["kcal"]
-        for meal in draft_plan:
-            for item in meal["internal_items"]:
-                item["gramas"] *= scaling_factor
-
-    # 5. FINALIZAR E FORMATAR
-    final_refeicoes = []
-    final_summary_after_scaling = {"kcal": 0, "p": 0, "c": 0, "g": 0}
-    horarios = {"cafe_da_manha": "08:00", "almoço": "12:30", "lanche": "16:00", "jantar": "20:30", "ceia": "22:30"}
-
-    for meal_draft in draft_plan:
-        final_macros = calculate_macros_from_list(meal_draft["internal_items"], db_foods)
-        formatted_items = [{"item": i["id"].replace("_", " ").title(), "qtd": int(i["gramas"]), "unidade": "g"} for i in meal_draft["internal_items"]]
-        
-        meal_final = {
-            "nome": meal_draft["nome"],
-            "kcal_total_refeicao": round(final_macros["kcal"]),
-            "macros": final_macros,
-            "itens": formatted_items,
-            "nome_refeicao": meal_draft["nome_refeicao_id"].replace("_", " ").title(),
-            "horario": horarios.get(meal_draft["nome_refeicao_id"], "N/A"),
-            "substituicoes": []
-        }
-        final_refeicoes.append(meal_final)
-        for key in final_summary_after_scaling:
-            final_summary_after_scaling[key] += final_macros[key]
-
-    response_payload = {
-        "plano": {
-            "paciente": paciente_info.get("nome", "Paciente"),
-            "data": datetime.now().strftime("%d/%m/%Y"),
-            "resumo": {
-                "meta_kcal": meta_kcal,
-                "total_kcal_calculado": round(final_summary_after_scaling["kcal"]),
-                "total_proteina_g": round(final_summary_after_scaling["p"]),
-                "total_carboidratos_g": round(final_summary_after_scaling["c"]),
-                "total_gordura_g": round(final_summary_after_scaling["g"])
-            },
-            "refeicoes": final_refeicoes
-        }
-    }
-    
-    return response_payload, 200
+---
+> Este documento é de uso exclusivo do destinatário e pode ter conteúdo confidencial. Qualquer uso, cópia, divulgação ou distribuição não autorizada é estritamente proibido.
