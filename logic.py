@@ -1,5 +1,4 @@
-# logic.py (Versão Final 14.0 - Sistema de Integridade Total)
-
+# logic.py
 from pulp import LpProblem, LpVariable, lpSum, LpMinimize, value
 from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 from datetime import datetime
