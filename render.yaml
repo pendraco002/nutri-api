@@ -1,8 +1,29 @@
+# render.yaml (Versão 2.5 - Otimizada para Integridade de Dados)
+
 services:
   - type: web
     name: nutri-api-engine
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn main:app"
+    buildCommand: "pip install -r requirements.txt && python -c 'from database import validate_food_data; result = validate_food_data(); print(\"Validação de dados:\", \"SUCESSO\" if result[\"valid\"] else \"FALHA\"); [print(f\"ERRO: {e}\") for e in result[\"errors\"]]'"
+    startCommand: "gunicorn main:app --workers=2 --timeout=60 --preload --log-level=info"
     autoDeploy: true
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "true"
+      - key: STRICT_VALIDATION
+        value: "true"
+      - key: ENFORCE_GRAMATURA
+        value: "true"
+      - key: MAX_NUTRITIONAL_DEVIATION
+        value: "5"
+      - key: DEFAULT_PORTION_WEIGHT_RULES
+        value: '{"proteina":100,"carboidrato":60,"vegetal":80,"fruta":100,"gordura":10}'
+    healthCheckPath: /health
+    healthCheckTimeout: 5
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+      targetMemoryPercent: 80
+    domains:
+      - nutri-api.dominio.com
