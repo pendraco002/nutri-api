@@ -1,5 +1,4 @@
-# database.py (Versão Final 10.0 - Completo, Sincronizado e com Validação Integrada)
-
+# database.py
 def get_food_data():
     """ Base de dados de alimentos com notas de preparo. Valores por 1 grama. """
     return {
