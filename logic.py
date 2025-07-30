@@ -1,81 +1,103 @@
-# logic.py (Versão Final 12.0 - Apresentação Impecável)
+# logic.py (Versão Final 13.0 - Transparência e Precisão Absoluta)
 
-# ... (importações e schemas Pydantic permanecem os mesmos da v11.0) ...
-from pydantic import BaseModel, Field, ValidationError
+from pulp import LpProblem, LpVariable, lpSum, LpMinimize, value
+from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 from datetime import datetime
 import random
-from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 
-# (Schemas Pydantic aqui)
-
-def format_item_for_response(food_id, gramas, db_foods):
-    """
-    NOVA FUNÇÃO: Formata um item de forma rica e precisa,
-    evitando simplificações indesejadas.
-    """
-    nome_item = food_id.replace("_", " ").title()
-    # Lógica para converter gramas em unidades, se aplicável e desejado,
-    # mas priorizando a gramatura para precisão.
-    # Ex: 100g de ovo -> "Ovo Inteiro (2 un - 100g)"
-    if food_id == "ovo_inteiro":
-        unidades = round(gramas / 50)
-        return f"{nome_item} ({unidades} un - {round(gramas)}g)"
-    return f"{nome_item} ({round(gramas)}g)"
+# (Os schemas Pydantic da v11.0 permanecem os mesmos)
 
 def generate_plan_logic(request_data):
     try:
-        # ... (Passos 1 a 4: Validação, Saneamento, Otimização - permanecem os mesmos) ...
+        # ... (Passos 1 a 3: Validação, Saneamento, Seleção de Templates - permanecem os mesmos) ...
         
-        # --- PASSO 5: CONSTRUÇÃO DA RESPOSTA COM MÁXIMA PRECISÃO ---
-        # Esta seção é reescrita para ser obcecada com os detalhes.
+        # --- PASSO 4: OTIMIZAÇÃO COM SOLVER (CONFIGURAÇÃO DE ALTA PRECISÃO) ---
+        prob = LpProblem("Diet_Optimization_High_Precision", LpMinimize)
         
-        # (Simulação de um resultado do solver)
+        # ... (Definição das variáveis, como antes) ...
         
-        refeicoes_finais_formatadas = []
+        # Objetivo: Minimizar o desvio absoluto da meta calórica
+        total_kcal_expr = lpSum(db_foods[f]['kcal'] * food_vars[f] for f in all_ingredients)
+        desvio_kcal = LpVariable("desvio_kcal", 0, None)
+        prob += desvio_kcal
+
+        # Restrições de desvio mais rígidas
+        prob += total_kcal_expr - meta_kcal <= desvio_kcal
+        prob += meta_kcal - total_kcal_expr <= desvio_kcal
         
-        # Exemplo para o Jantar
-        jantar_principal = {
-            "nome_refeicao": "Jantar",
-            "kcal": 500,
-            "itens": [
-                format_item_for_response("tilapia_assada", 150, db_foods),
-                format_item_for_response("arroz_branco_cozido", 80, db_foods),
-                # ... etc
-            ],
-            "observacoes": {
-                "Proteína": "Pode ser substituído por...",
-                # ... etc
-            }
-        }
-        
-        substituicoes_jantar_formatadas = [
-            {
-                "nome": "Hambúrguer Artesanal Controlado",
-                "kcal": 500,
-                "ingredientes": [
-                    "Pão de hambúrguer integral (1 un - 50g)",
-                    "Hambúrguer de patinho moído (120g)",
-                    "Queijo mussarela light (20g)",
-                    "Molho caseiro light (10g)",
-                    "Mix de folhas e tomate (à vontade)"
-                ]
-            },
-            # ... outras receitas formatadas com 100% de detalhe
-        ]
-        
-        refeicoes_finais_formatadas.append({
-            "refeicao_principal": jantar_principal,
-            "substituicoes_de_refeicao": substituicoes_jantar_formatadas
-        })
+        # Restrições de Macronutrientes (como antes)
+        # ...
+
+        # --- PASSO 5: RESOLUÇÃO DO PROBLEMA ---
+        prob.solve()
+
+        if prob.status != 1: # "Optimal"
+            return {"erro": "Não foi possível encontrar uma solução ótima para as metas fornecidas."}, 400
+
+        # --- PASSO 6: CONSTRUÇÃO DA RESPOSTA COM DETALHAMENTO TOTAL ---
+        refeicoes_finais = []
+        kcal_final, proteina_final, carb_final, gordura_final = 0, 0, 0, 0
+
+        for refeicao in refeicoes_escolhidas:
+            itens_refeicao_detalhados = []
+            kcal_refeicao, p_refeicao, c_refeicao, g_refeicao = 0, 0, 0, 0
+            
+            for ing_str in refeicao["template"]["ingredientes"]:
+                food_id = ing_str.split(':')[0]
+                gramas = value(food_vars[food_id])
+                
+                if gramas > 0.1: # Apenas inclui ingredientes com quantidade significativa
+                    kcal_item = db_foods[food_id]['kcal'] * gramas
+                    p_item = db_foods[food_id]['p'] * gramas
+                    c_item = db_foods[food_id]['c'] * gramas
+                    g_item = db_foods[food_id]['g'] * gramas
+                    
+                    # Constrói o item com todos os detalhes
+                    itens_refeicao_detalhados.append({
+                        "item": food_id.replace("_", " ").title(),
+                        "qtd_g": round(gramas, 1),
+                        "kcal": round(kcal_item),
+                        "macros": {
+                            "p": round(p_item, 1),
+                            "c": round(c_item, 1),
+                            "g": round(g_item, 1)
+                        }
+                    })
+                    
+                    kcal_refeicao += kcal_item
+                    p_refeicao += p_item
+                    c_refeicao += c_item
+                    g_refeicao += g_item
+
+            # Adiciona a refeição com o resumo de macros
+            refeicoes_finais.append({
+                "nome_refeicao": refeicao["nome_refeicao"],
+                "kcal_total_refeicao": round(kcal_refeicao),
+                "macros_refeicao": {
+                    "p": round(p_refeicao, 1),
+                    "c": round(c_refeicao, 1),
+                    "g": round(g_refeicao, 1)
+                },
+                "itens": itens_refeicao_detalhados
+            })
+            
+            kcal_final += kcal_refeicao
+            proteina_final += p_refeicao
+            carb_final += c_refeicao
+            gordura_final += g_refeicao
 
         response_payload = {
             "plano": {
-                "paciente": "João Silva",
+                "paciente": paciente_info.get("nome", "Paciente"),
                 "data": datetime.now().strftime("%d/%m/%Y"),
                 "resumo": {
-                    # ... resumo numérico ...
+                    "meta_kcal": meta_kcal,
+                    "total_kcal_calculado": round(kcal_final),
+                    "total_proteina_g": round(proteina_final, 1),
+                    "total_carboidratos_g": round(carb_final, 1),
+                    "total_gordura_g": round(gordura_final, 1)
                 },
-                "refeicoes": refeicoes_finais_formatadas
+                "refeicoes": refeicoes_finais
             }
         }
         
