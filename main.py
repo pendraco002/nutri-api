@@ -1,6 +1,5 @@
-# main.py (Versão Final 12.0 - Segurança Avançada e Integridade de Dados)
-
-from flask import Flask, request, jsonify, Response
+# main.py
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -220,7 +219,7 @@ if __name__ == "__main__":
     if debug_mode:
         app.run(host="0.0.0.0", port=port, debug=True)
     else:
-        # Para produção, é mais seguro usar um servidor WSGI como gunicorn
+        # Para produção, é mais seguro usar um servidor WSGI como waitress
         import waitress
         logger.info(f"Iniciando servidor em modo produção na porta {port}")
         waitress.serve(app, host="0.0.0.0", port=port, threads=4)
