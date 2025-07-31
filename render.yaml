@@ -1,14 +1,18 @@
-# render.yaml
+# render.yaml - Configuração segura
 services:
   - type: web
     name: nutri-api-engine
-    env: python
+    runtime: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn main:app"
+    startCommand: "gunicorn main:app --workers 2 --threads 4"
     autoDeploy: true
     envVars:
       - key: PYTHONUNBUFFERED
         value: "true"
+      - key: FLASK_ENV
+        value: "production"
       - key: NUTRI_API_KEY
-        value: "chave_secreta_para_acessar_api"
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: "https://chat.openai.com,https://chatgpt.com"
