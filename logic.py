@@ -1,4 +1,4 @@
-# logic.py - VERSÃO PEDRO BARROS - PARTE 1/2
+# logic.py - VERSÃO PEDRO BARROS COMPLETA
 from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 from datetime import datetime
 import random
@@ -305,7 +305,6 @@ class NutriPlanPedroBarros:
         }
         
         return [sub1, sub2, sub3, sub4, sub5, sub6]
-        # logic.py - VERSÃO PEDRO BARROS - PARTE 2/2
 
     def generate_jantar_substituicoes(self):
         """Gera as 4 substituições obrigatórias do jantar."""
