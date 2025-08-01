@@ -1,4 +1,4 @@
-# logic.py - VERSÃO CORRIGIDA COM AJUSTE PRECISO
+# logic.py - VERSÃO COM DEBUG
 from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 from datetime import datetime
 import json
@@ -129,6 +129,10 @@ Este documento é de uso exclusivo do destinatário e pode ter conteúdo confide
 
 def generate_plan_logic(request_data):
     """Função principal que gera o plano no formato Pedro Barros FIXO."""
+    print("=== INICIANDO GENERATE_PLAN_LOGIC ===")
+    print("=== VERSÃO: CÓDIGO FIXO 2000 KCAL ===")
+    print(f"=== DATA/HORA: {datetime.now()} ===")
+    
     try:
         # Extrai dados
         paciente = request_data.get('paciente', {})
@@ -137,6 +141,9 @@ def generate_plan_logic(request_data):
         nome = paciente.get('nome', 'Paciente')
         peso = paciente.get('peso_kg', 70)
         data = datetime.now().strftime("%d/%m/%Y")
+        
+        print(f"=== PACIENTE: {nome}, PESO: {peso}kg ===")
+        print(f"=== META KCAL: {metas.get('kcal_total', 2000)} ===")
         
         # Meta calórica
         kcal_total = metas.get('kcal_total', 2000)
@@ -289,6 +296,8 @@ Outra opção de pasta: 100g de atum + 20g de requeijão light.""")
             'fibra_g': 35
         }
         
+        print(f"=== TOTAIS CALCULADOS: {totais_calculados} ===")
+        
         output += formatter.format_resumo_nutricional(metas, totais_calculados, peso)
         
         # Rodapé
@@ -305,10 +314,11 @@ Outra opção de pasta: 100g de atum + 20g de requeijão light.""")
             }
         }
         
+        print("=== PLANO GERADO COM SUCESSO ===")
         return response, 200
         
     except Exception as e:
-        print(f"Erro ao gerar plano: {str(e)}")
+        print(f"=== ERRO AO GERAR PLANO: {str(e)} ===")
         import traceback
         traceback.print_exc()
         return {'erro': f'Erro ao gerar plano: {str(e)}'}, 500
