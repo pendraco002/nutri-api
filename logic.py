@@ -348,3 +348,5 @@ class NutriAssistentMemory:
     @classmethod
     def get_ultimo_plano(cls):
         return cls.ultimo_plano
+
+# FORÇA REBUILD - VERSÃO 2
