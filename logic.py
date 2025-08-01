@@ -1,4 +1,7 @@
-# logic.py - VERSÃO COM DEBUG
+# logic.py - VERSÃO COM DEBUG NO TOPO
+print("=== CARREGANDO LOGIC.PY VERSÃO DEBUG ===")
+print("=== ESTE PRINT DEVE APARECER NO LOG DO RENDER ===")
+
 from database import get_food_data, get_meal_templates, get_substitution_rules, get_static_info
 from datetime import datetime
 import json
