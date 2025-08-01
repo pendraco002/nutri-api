@@ -1,4 +1,4 @@
-# main.py - VERSÃO COMPLETA SEM FLASK_LIMITER
+# main.py - VERSÃO OTIMIZADA
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -27,8 +27,11 @@ if allowed_origins == "*":
 else:
     CORS(app, resources={r"/*": {"origins": allowed_origins.split(",")}})
 
-# Chave da API (em produção, use variáveis de ambiente)
+# Chave da API
 API_KEY = os.environ.get('API_KEY', 'your-secret-api-key')
+
+# Constantes
+MAX_PAYLOAD_SIZE = 100000  # 100KB
 
 def require_api_key(f):
     @wraps(f)
@@ -86,6 +89,11 @@ def gerar_plano():
             logger.warning(f"Request {request_id} - Empty request body")
             return jsonify({'erro': 'Dados não fornecidos'}), 400
         
+        # Valida tamanho do payload
+        if len(request.data) > MAX_PAYLOAD_SIZE:
+            logger.warning(f"Request {request_id} - Payload too large: {len(request.data)} bytes")
+            return jsonify({'erro': 'Payload muito grande'}), 413
+        
         # Parse do JSON
         try:
             request_data = request.get_json()
@@ -97,14 +105,20 @@ def gerar_plano():
         if not request_data:
             return jsonify({'erro': 'Dados vazios'}), 400
         
-        if 'paciente' not in request_data:
-            return jsonify({'erro': 'Dados do paciente não fornecidos'}), 400
+        # Validação do paciente
+        paciente = request_data.get('paciente', {})
+        if not paciente.get('nome'):
+            return jsonify({'erro': 'Nome do paciente não fornecido'}), 400
+        if not paciente.get('peso_kg'):
+            return jsonify({'erro': 'Peso do paciente não fornecido'}), 400
         
-        if 'metas' not in request_data:
-            return jsonify({'erro': 'Metas nutricionais não fornecidas'}), 400
+        # Validação das metas
+        metas = request_data.get('metas', {})
+        if not metas.get('kcal_total'):
+            return jsonify({'erro': 'Meta calórica não fornecida'}), 400
         
         # Log dos dados recebidos (sem dados sensíveis)
-        logger.info(f"Request {request_id} - Processing plan for patient")
+        logger.info(f"Request {request_id} - Processing plan for patient: {paciente.get('nome', 'Unknown')}")
         
         # Chama a lógica principal
         response, status_code = generate_plan_logic(request_data)
