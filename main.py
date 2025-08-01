@@ -1,4 +1,4 @@
-# main.py - VERSÃO QUE USA PLANNER.PY
+# main.py - VERSÃO COMPLETA SEM FLASK_LIMITER
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -8,10 +8,8 @@ import uuid
 from functools import wraps
 from datetime import datetime
 
-print("=== MAIN.PY CARREGADO - VERSÃO PLANNER ===")
-
-# Importa do NOVO arquivo
-from planner import generate_plan_fixed
+# Importa a lógica principal
+from logic import generate_plan_logic
 
 # Configuração de logging
 logging.basicConfig(
@@ -80,7 +78,6 @@ def health():
 @require_api_key
 def gerar_plano():
     """Endpoint principal para gerar planos nutricionais."""
-    print("=== ENDPOINT /gerarPlano CHAMADO - USANDO PLANNER ===")
     request_id = request.request_id
     
     try:
@@ -108,15 +105,13 @@ def gerar_plano():
         
         # Log dos dados recebidos (sem dados sensíveis)
         logger.info(f"Request {request_id} - Processing plan for patient")
-        print(f"=== CHAMANDO generate_plan_fixed DO PLANNER ===")
         
-        # Chama a nova função do planner.py
-        response, status_code = generate_plan_fixed(request_data)
+        # Chama a lógica principal
+        response, status_code = generate_plan_logic(request_data)
         
         # Log do resultado
         if status_code == 200:
             logger.info(f"Request {request_id} - Plan generated successfully")
-            print("=== PLANO FIXO GERADO COM SUCESSO ===")
         else:
             logger.error(f"Request {request_id} - Error generating plan: {response.get('erro', 'Unknown error')}")
         
@@ -124,7 +119,6 @@ def gerar_plano():
         
     except Exception as e:
         logger.error(f"Request {request_id} - Unexpected error: {str(e)}", exc_info=True)
-        print(f"=== ERRO INESPERADO: {str(e)} ===")
         return jsonify({
             'erro': 'Erro interno do servidor',
             'request_id': request_id
@@ -144,8 +138,6 @@ def internal_error(error):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
-    
-    print(f"=== INICIANDO SERVIDOR NA PORTA {port} - VERSÃO PLANNER ===")
     
     if debug:
         app.run(debug=True, host='0.0.0.0', port=port)
