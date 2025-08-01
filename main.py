@@ -1,92 +1,164 @@
-# main.py
+# main.py - VERSÃO COMPLETA E CORRIGIDA
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
+import json
+import logging
+import uuid
+from functools import wraps
 from datetime import datetime
+
+# Importa a lógica principal
 from logic import generate_plan_logic
-from database import validate_food_data
+
+# Configuração de logging
+logging.basicConfig(
+   level=logging.INFO,
+   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configurar CORS
-CORS(app, origins=['*'])
-
-# Configuração básica
-app.config['JSON_AS_ASCII'] = False
-app.config['JSON_SORT_KEYS'] = False
-
-# Validar dados ao iniciar
-validation_result = validate_food_data()
-if not validation_result['valid']:
-    print(f"⚠️ Erros na base de dados: {validation_result['errors']}")
+# Configuração CORS - CORRIGIDA
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*")
+if allowed_origins == "*":
+   CORS(app, resources={r"/*": {"origins": "*"}})
 else:
-    print(f"✅ Base validada: {validation_result['total_foods']} alimentos")
+   CORS(app, resources={r"/*": {"origins": allowed_origins.split(",")}})
+
+# Configuração do Rate Limiter
+limiter = Limiter(
+   app=app,
+   key_func=get_remote_address,
+   default_limits=["200 per day", "50 per hour"]
+)
+
+# Chave da API (em produção, use variáveis de ambiente)
+API_KEY = os.environ.get('API_KEY', 'your-secret-api-key')
+
+def require_api_key(f):
+   @wraps(f)
+   def decorated_function(*args, **kwargs):
+       api_key = request.headers.get('X-API-Key')
+       if api_key != API_KEY:
+           logger.warning(f"Unauthorized access attempt from {request.remote_addr}")
+           return jsonify({'erro': 'Não autorizado'}), 401
+       return f(*args, **kwargs)
+   return decorated_function
+
+def generate_request_id():
+   """Gera um ID único para cada requisição."""
+   return str(uuid.uuid4())
+
+@app.before_request
+def before_request():
+   """Adiciona request_id ao contexto."""
+   request.request_id = generate_request_id()
+   logger.info(f"Request {request.request_id} - {request.method} {request.path}")
+
+@app.after_request
+def after_request(response):
+   """Log da resposta."""
+   logger.info(f"Request {request.request_id} - Status: {response.status_code}")
+   return response
 
 @app.route('/')
 def home():
-    return jsonify({
-        "message": "NutriAPI v4.0 - Motor de Cálculo Nutricional",
-        "status": "online",
-        "endpoints": {
-            "/": "Esta mensagem",
-            "/health": "Status da API",
-            "/gerarPlano": "POST - Gerar plano alimentar"
-        }
-    })
+   """Endpoint raiz."""
+   return jsonify({
+       'status': 'online',
+       'service': 'NutriAPI - Motor de Cálculo Nutricional',
+       'version': '4.0.0',
+       'timestamp': datetime.utcnow().isoformat()
+   })
 
-@app.route('/health', methods=['GET'])
+@app.route('/health')
 def health():
-    return jsonify({
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "version": "4.0.0"
-    })
+   """Health check endpoint."""
+   return jsonify({
+       'status': 'healthy',
+       'timestamp': datetime.utcnow().isoformat()
+   })
 
 @app.route('/gerarPlano', methods=['POST'])
+@require_api_key
+@limiter.limit("10 per minute")
 def gerar_plano():
-    try:
-        # Validar API Key
-        api_key = request.headers.get('X-API-Key')
-        if not api_key or api_key != os.getenv('API_KEY', 'default-key'):
-            return jsonify({'error': 'API Key inválida'}), 401
-        
-        # Obter dados da requisição
-        data = request.get_json()
-        
-        # Validações básicas
-        if not data:
-            return jsonify({'error': 'Dados não fornecidos'}), 400
-            
-        if 'paciente' not in data:
-            return jsonify({'error': 'Dados do paciente são obrigatórios'}), 400
-            
-        if 'peso_kg' not in data['paciente']:
-            return jsonify({'error': 'Peso do paciente é obrigatório'}), 400
-        
-        # Gerar plano
-        result, status_code = generate_plan_logic(data)
-        
-        # Adicionar request_id se sucesso
-        if status_code == 200:
-            result['request_id'] = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-        
-        return jsonify(result), status_code
-        
-    except Exception as e:
-        print(f"Erro ao gerar plano: {str(e)}")
-        return jsonify({
-            'error': 'Erro interno ao processar requisição',
-            'details': str(e)
-        }), 500
+   """Endpoint principal para gerar planos nutricionais."""
+   request_id = request.request_id
+   
+   try:
+       # Valida se há dados no request
+       if not request.data:
+           logger.warning(f"Request {request_id} - Empty request body")
+           return jsonify({'erro': 'Dados não fornecidos'}), 400
+       
+       # Parse do JSON
+       try:
+           request_data = request.get_json()
+       except Exception as e:
+           logger.error(f"Request {request_id} - Invalid JSON: {str(e)}")
+           return jsonify({'erro': 'JSON inválido'}), 400
+       
+       # Validação básica dos dados
+       if not request_data:
+           return jsonify({'erro': 'Dados vazios'}), 400
+       
+       if 'paciente' not in request_data:
+           return jsonify({'erro': 'Dados do paciente não fornecidos'}), 400
+       
+       if 'metas' not in request_data:
+           return jsonify({'erro': 'Metas nutricionais não fornecidas'}), 400
+       
+       # Log dos dados recebidos (sem dados sensíveis)
+       logger.info(f"Request {request_id} - Processing plan for patient")
+       
+       # Chama a lógica principal
+       response, status_code = generate_plan_logic(request_data)
+       
+       # Log do resultado
+       if status_code == 200:
+           logger.info(f"Request {request_id} - Plan generated successfully")
+       else:
+           logger.error(f"Request {request_id} - Error generating plan: {response.get('erro', 'Unknown error')}")
+       
+       return jsonify(response), status_code
+       
+   except Exception as e:
+       logger.error(f"Request {request_id} - Unexpected error: {str(e)}", exc_info=True)
+       return jsonify({
+           'erro': 'Erro interno do servidor',
+           'request_id': request_id
+       }), 500
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({'error': 'Endpoint não encontrado'}), 404
+   """Handler para rotas não encontradas."""
+   return jsonify({'erro': 'Endpoint não encontrado'}), 404
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+   """Handler para rate limit excedido."""
+   return jsonify({
+       'erro': 'Limite de requisições excedido',
+       'mensagem': str(e.description)
+   }), 429
 
 @app.errorhandler(500)
 def internal_error(error):
-    return jsonify({'error': 'Erro interno do servidor'}), 500
+   """Handler para erros internos."""
+   logger.error(f"Internal server error: {str(error)}", exc_info=True)
+   return jsonify({'erro': 'Erro interno do servidor'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+   port = int(os.environ.get('PORT', 5000))
+   debug = os.environ.get('FLASK_ENV') == 'development'
+   
+   if debug:
+       app.run(debug=True, host='0.0.0.0', port=port)
+   else:
+       # Em produção, use um servidor WSGI como gunicorn
+       app.run(debug=False, host='0.0.0.0', port=port)
