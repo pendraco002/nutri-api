@@ -510,13 +510,12 @@ class PedroBarrosPlannerPerfeito:
 
 
 def is_complex_request(request_data):
-    """Detecta se a requisição requer lógica complexa - VERSÃO MELHORADA."""
+    """Detecta se a requisição requer lógica complexa - VERSÃO ULTRA ROBUSTA."""
     try:
-        # Verifica configurações especiais
+        # Verifica configurações especiais (se existirem)
         config = request_data.get('configuracoes', {})
         
-        # Casos que requerem lógica complexa:
-        
+        # CAMADA 1: Detecção por configurações estruturadas
         # 1. Número de refeições diferente de 5
         num_refeicoes = config.get('num_refeicoes', 5)
         if num_refeicoes != 5:
@@ -546,7 +545,38 @@ def is_complex_request(request_data):
         if 'restricoes_macros_refeicao' in config:
             return True, "Restrições de macros por refeição"
         
-        # 8. DETECÇÃO INTELIGENTE - Analisa texto livre do input
+        # CAMADA 2: Detecção por campos em locais incorretos (Custom GPT bugada)
+        metas = request_data.get('metas', {})
+        paciente = request_data.get('paciente', {})
+        
+        # Custom GPT às vezes coloca num_refeicoes em metas (ERRO!)
+        if 'num_refeicoes' in metas and metas['num_refeicoes'] != 5:
+            return True, f"Número de refeições em metas: {metas['num_refeicoes']}"
+        
+        # Detecta campos que não deveriam estar em metas
+        campos_suspeitos = ['pre_treino', 'pos_treino', 'hamburguer', 'ordem_refeicoes']
+        for campo in campos_suspeitos:
+            if campo in metas:
+                return True, f"Campo suspeito em metas: {campo}"
+        
+        # CAMADA 3: Detecção por padrões específicos de valores
+        # Proteína muito alta (>2.8g/kg) indica atleta/bodybuilder
+        if metas.get('proteina_min_g_por_kg', 0) > 2.8:
+            return True, f"Proteína alta para atleta: {metas['proteina_min_g_por_kg']}g/kg"
+        
+        # Calorias muito baixas (<1200) ou muito altas (>3500) indicam casos especiais
+        kcal_total = metas.get('kcal_total', 2000)
+        if kcal_total < 1200:
+            return True, f"Calorias muito baixas: {kcal_total} (possível jejum)"
+        if kcal_total > 3500:
+            return True, f"Calorias muito altas: {kcal_total} (possível atleta)"
+        
+        # CAMADA 4: Detecção por nome/contexto do paciente
+        nome = paciente.get('nome', '').lower()
+        if any(palavra in nome for palavra in ['teste', 'complexo', 'especial', 'atleta', 'bodybuilder']):
+            return True, f"Nome indica caso especial: {nome}"
+        
+        # CAMADA 5: DETECÇÃO INTELIGENTE - Analisa texto livre do input
         # Busca por palavras-chave que indicam casos especiais
         texto_completo = str(request_data).lower()
         
@@ -582,11 +612,96 @@ def is_complex_request(request_data):
         if any(palavra in texto_completo for palavra in ['ptn igual ou maior que carbo', 'proteína >= carboidrato']):
             return True, "Restrições de macros detectadas"
         
+        # CAMADA 6: Detecção por padrões de Custom GPT específicos
+        # Se tem campos que a GPT costuma adicionar para casos especiais
+        if any(campo in str(request_data) for campo in ['sobremesa', 'artesanal', 'especial', 'customizado']):
+            return True, "Padrões de Custom GPT detectados"
+        
         return False, "Caso padrão"
         
     except Exception as e:
         print(f"Erro na detecção de complexidade: {str(e)}")
         return False, "Erro na detecção"
+
+
+def reconstruct_complex_config_from_broken_request(request_data):
+    """Reconstrói configurações complexas quando a Custom GPT as remove/corrompe."""
+    try:
+        config = {}
+        metas = request_data.get('metas', {})
+        texto_completo = str(request_data).lower()
+        
+        # Reconstrói num_refeicoes se estiver em lugar errado
+        if 'num_refeicoes' in metas:
+            config['num_refeicoes'] = metas['num_refeicoes']
+        
+        # Detecta e reconstrói pré-treino
+        if 'pré treino' in texto_completo or 'pre treino' in texto_completo:
+            # Tenta extrair calorias do pré-treino
+            import re
+            match_kcal = re.search(r'pré?\s*treino.*?(\d+)\s*kcal', texto_completo)
+            if match_kcal:
+                config['pre_treino'] = {'kcal': int(match_kcal.group(1))}
+            else:
+                config['pre_treino'] = {'kcal': 120}  # padrão
+        
+        # Detecta e reconstrói hambúrguer obrigatório
+        if 'hambúrguer' in texto_completo or 'hamburguer' in texto_completo:
+            config['refeicoes_obrigatorias'] = {
+                'jantar': {
+                    'tipo': 'hamburguer',
+                    'nome': 'Hambúrguer Artesanal'
+                }
+            }
+        
+        # Reconstrói ordem baseada em padrões detectados
+        if 'refeição 1' in texto_completo:
+            ordem = []
+            for i in range(1, 6):
+                match = re.search(f'refeição {i}[:\s]+([^\n]+)', texto_completo)
+                if match:
+                    refeicao_desc = match.group(1).strip()
+                    if 'almoço' in refeicao_desc or 'almoco' in refeicao_desc:
+                        ordem.append('almoco')
+                    elif 'pré treino' in refeicao_desc or 'pre treino' in refeicao_desc:
+                        ordem.append('pre_treino')
+                    elif 'lanche' in refeicao_desc:
+                        ordem.append('lanche')
+                    elif 'jantar' in refeicao_desc:
+                        ordem.append('jantar')
+                    elif 'sobremesa' in refeicao_desc:
+                        ordem.append('sobremesa')
+            
+            if ordem:
+                config['ordem_refeicoes'] = ordem
+                config['num_refeicoes'] = len(ordem)
+        
+        # Reconstrói distribuição especial se detectada
+        if 'última refeições com maior' in texto_completo or 'maior %' in texto_completo:
+            kcal_total = metas.get('kcal_total', 1650)
+            if config.get('num_refeicoes') == 5 and config.get('pre_treino'):
+                # Padrão do input2.txt: almoço, pré-treino, lanche, jantar (maior), sobremesa
+                config['distribuicao_calorica'] = {
+                    'almoco': kcal_total * 0.25,
+                    'pre_treino': config['pre_treino']['kcal'],
+                    'lanche': kcal_total * 0.20,
+                    'jantar': kcal_total * 0.35,  # maior %
+                    'sobremesa': kcal_total * 0.13
+                }
+        
+        # Reconstrói restrições de macros
+        if 'ptn igual ou maior que carbo' in texto_completo:
+            config['restricoes_macros_refeicao'] = {
+                'todas_exceto_pre_treino': {
+                    'proteina_maior_igual_carbo': True
+                }
+            }
+        
+        return config
+        
+    except Exception as e:
+        print(f"Erro ao reconstruir configurações: {str(e)}")
+        return {}
 
 
 def parse_text_input_to_structured(text_input):
@@ -1118,13 +1233,29 @@ def apply_macro_restrictions(componente, restricoes):
 
 
 def generate_plan_logic(request_data):
-    """Função principal PERFEITA que gera o plano no formato Pedro Barros."""
+    """Função principal ULTRA ROBUSTA que gera o plano no formato Pedro Barros."""
     try:
+        # CAMADA DE PROTEÇÃO: Reconstrói configurações se a Custom GPT as corrompeu
+        config_original = request_data.get('configuracoes', {})
+        
         # Detecta se é um caso complexo
         is_complex, reason = is_complex_request(request_data)
         
         if is_complex:
             print(f"Caso complexo detectado: {reason}")
+            
+            # Se não há configurações ou estão incompletas, tenta reconstruir
+            if not config_original or len(config_original) < 2:
+                print("⚠️  Configurações ausentes/incompletas - reconstruindo automaticamente...")
+                config_reconstruida = reconstruct_complex_config_from_broken_request(request_data)
+                
+                if config_reconstruida:
+                    # Adiciona as configurações reconstruídas ao request
+                    request_data['configuracoes'] = {**config_original, **config_reconstruida}
+                    print(f"✅ Configurações reconstruídas: {list(config_reconstruida.keys())}")
+                else:
+                    print("❌ Não foi possível reconstruir configurações - usando detecção básica")
+            
             return generate_from_complex_input(request_data)
         
         # Caso padrão - continua com a lógica original
