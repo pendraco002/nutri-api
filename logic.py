@@ -1189,12 +1189,29 @@ def get_default_meal_component(nome_refeicao, biblioteca):
         return biblioteca.get_jantar_principal()
     elif nome_refeicao == 'ceia':
         return biblioteca.get_ceia_componentes()[0]
-    else:
-        # Componente genérico
+    elif nome_refeicao == 'sobremesa':
+        # Sobremesa padrão: iogurte + fruta + whey + chia
         return ComponenteModularPerfeito(
-            nome="Refeição Padrão",
-            items=[{"nome": "Componente genérico", "qtd": 100, "medida": "Grama", "kcal": 200}],
-            obs=None
+            nome="Sobremesa",
+            items=[
+                {"nome": "Iogurte natural desnatado", "qtd": 120, "medida": "Grama", "kcal": 50.16},
+                {"nome": "Frutas (menos banana e abacate)", "qtd": 100, "medida": "Grama", "kcal": 48.00},
+                {"nome": "Whey Protein - Killer Whey / Heavy Suppz", "qtd": 20, "medida": "Grama", "kcal": 81.14},
+                {"nome": "Chia em Grãos", "qtd": 5, "medida": "Grama", "kcal": 19.33}
+            ],
+            obs="iogurte + fruta + whey + chia"
+        )
+    else:
+        # Componente genérico mais robusto baseado na meta calórica
+        return ComponenteModularPerfeito(
+            nome="Refeição Especial",
+            items=[
+                {"nome": "Whey Protein - Killer Whey / Heavy Suppz", "qtd": 30, "medida": "Grama", "kcal": 121.71},
+                {"nome": "Frutas (menos banana e abacate)", "qtd": 100, "medida": "Grama", "kcal": 48.00},
+                {"nome": "Iogurte natural desnatado", "qtd": 100, "medida": "Grama", "kcal": 41.80},
+                {"nome": "Aveia em flocos", "qtd": 30, "medida": "Grama", "kcal": 114.00}
+            ],
+            obs="Refeição balanceada"
         )
 
 
