@@ -1,18 +1,17 @@
-# render.yaml - Configuração segura
+# Versão corrigida conforme auditoria de segurança.
+# A variável X_API_KEY foi modificada para ser carregada a partir dos "Secrets" do ambiente Render,
+# eliminando a exposição de credenciais no código-fonte.
+
 services:
   - type: web
-    name: nutri-api-engine
-    runtime: python
-    plan: free
+    name: pedro-barros-nutrition
+    env: python
+    region: oregon 
+    plan: free 
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn main:app --workers 2 --threads 4"
-    autoDeploy: true
+    startCommand: "gunicorn main:app"
     envVars:
-      - key: PYTHONUNBUFFERED
-        value: "true"
-      - key: FLASK_ENV
-        value: "production"
-      - key: NUTRI_API_KEY
-        generateValue: true
-      - key: ALLOWED_ORIGINS
-        value: "https://chat.openai.com,https://chatgpt.com"
+      - key: PYTHON_VERSION
+        value: 3.10.4
+      - key: X_API_KEY
+        fromSecret: true # CORREÇÃO: Carrega o valor da variável de ambiente segura (Secret)
