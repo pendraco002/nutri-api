@@ -1,18 +1,13 @@
-# corrected_render.yaml
-# Versão corrigida conforme auditoria de segurança.
-# A variável X_API_KEY foi modificada para ser carregada a partir dos "Secrets" do ambiente Render,
-# eliminando a exposição de credenciais no código-fonte.
-
 services:
   - type: web
-    name: pedro-barros-nutrition
+    name: nutri-api-service
     env: python
-    region: oregon # ou sua região de preferência
-    plan: free # ou seu plano atual
+    region: oregon 
+    plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn nutri_api_engine_v2:app" # Verifique se o nome do arquivo principal é nutri_api_engine_v2.py
+    startCommand: "gunicorn app:app"
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.4
       - key: X_API_KEY
-        fromSecret: true # CORREÇÃO CRÍTICA: Carrega o valor da variável de ambiente segura (Secret)
+        fromSecret: true
