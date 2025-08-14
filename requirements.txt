@@ -1,2 +1,16 @@
+# ==============================================================================
+#  Python Application Dependencies
+# ==============================================================================
+# Este arquivo especifica as bibliotecas Python necessárias para a execução
+# da aplicação. Utilizar versões fixas (pinning) com '==' é uma boa prática
+# para garantir que o ambiente de produção seja determinístico e reproduzível.
+#
+# Para instalar estas dependências, execute o comando:
+# pip install -r requirements.txt
+# ==============================================================================
+
+# Framework web principal para a construção da API.
 Flask==3.0.3
+
+# Servidor WSGI (Web Server Gateway Interface) para produção.
 gunicorn==22.0.0
