@@ -67,7 +67,7 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/generate_plan', methods=['POST'])
+@app.route('/gerarPlano', methods=['POST']
 @require_api_key
 def handle_generate_plan():
     patient_data = request.get_json()
